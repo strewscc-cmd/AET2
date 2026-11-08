@@ -166,6 +166,25 @@ input[type=text]:focus{border-color:var(--b)}
 
 <script>
 const CONFIG={firebase:'https://analyticalexposition2-default-rtdb.asia-southeast1.firebasedatabase.app/',gas:'https://script.google.com/macros/s/AKfycby3pz1MdP4SLVmMeWAOOiHlGjtG4IB33bcdZx_BFplVIZ1D0xHS_GMHFnWegqNvM8r9/exec',resetPin:'2026',energyMax:100,wrongCost:10,reward:5000,reporterEvery:[3,5],stealAmt:3000,stealCooldown:20}; // teacher: paste your Firebase Realtime Database URL and Apps Script URL here (optional, can also be set in ⚙️)
+const SFX={
+  correct:new Audio(encodeURI('Correct Ding - Sound effect (HD).mp3')),
+  wrong:new Audio(encodeURI('Wrong Buzzer - Sound Effect.mp3')),
+  steal:new Audio(encodeURI('Police Siren (Distant) - Sound Effect ProSounds.mp3'))
+};
+Object.values(SFX).forEach(a=>{a.preload='auto';a.volume=.75});
+let sfxUnlocked=false;
+function unlockSfx(){
+  if(sfxUnlocked)return;sfxUnlocked=true;
+  Object.values(SFX).forEach(a=>{
+    a.muted=true;
+    const p=a.play();
+    if(p&&p.then)p.then(()=>{a.pause();a.currentTime=0;a.muted=false}).catch(()=>{a.muted=false;sfxUnlocked=false});
+  });
+}
+function playSfx(name){
+  const a=SFX[name];if(!a)return;
+  try{a.pause();a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
+}
 const QB={
             makeup: {
                 A: [
@@ -680,7 +699,7 @@ const REP=[];VERBS.forEach((v,k)=>{[[1,0,'What is the V2 (past form) of “'+v[0
 function toast(t){const m=$('#msg');m.textContent=t;m.classList.remove('hide');clearTimeout(msgT);msgT=setTimeout(()=>m.classList.add('hide'),4500)}
 function stealTo(id){if(!id||Date.now()<stealCd)return;stealCd=Date.now()+CONFIG.stealCooldown*1000;stealWait={to:id};Net.ev(id,{t:'steal',amt:CONFIG.stealAmt});toast('🦹 Sneaking up…');setTimeout(()=>{if(stealWait&&stealWait.to===id){stealWait=null;toast('Nothing happened…')}},7000)}
 function onEv(e){const who=(Net.peers[e.from]||{}).name||'Someone';
-  if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;ok=true;toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
+  if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;ok=true;playSfx('steal');toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
   else if(e.t==='res'&&stealWait&&stealWait.to===e.from){stealWait=null;if(e.ok){mo+=e.amt;toast(`🦹 You stole ${rp(e.amt)} from ${who}!`)}else{const l=Math.min(e.amt,mo);mo-=l;toast(`😬 ${who} had no money! You lost ${rp(l)}.`)}hud();persist()}}
 const FOOD=[{n:'Es Teh',ic:'🧋',p:3000,e:10},{n:'Cimol Bojot',ic:'🍢',p:5000,e:25},{n:'Bakso',ic:'🍜',p:8000,e:45},{n:'Nasi Uduk Komplit',ic:'🍛',p:12000,e:80}];
 const hidePress=()=>{clearTimeout(pressT);$('#press').classList.add('hide')};
@@ -690,7 +709,7 @@ function reporterAsk(){
   rcur=q.id;persist();
   open(`<div class="who">${npcPortrait(nb)}<div class="bubble"><b class="nm">📰 ${nb.npc.n} · School Reporter</b>Excuse me, ${me.name}! A quick interview for the school paper. Answer right and earn <b>${rp(CONFIG.reward)}</b>! (No energy lost if you miss.)</div></div><div class="q">${q.q}</div><div id="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><i>${'ABCD'[i]}</i><span>${o.t}</span></button>`).join('')}</div><div id="fbx"></div>`);
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.i];document.querySelectorAll('.opt').forEach(x=>x.disabled=true);ru[q.id]=1;rcur=null;
-    if(o.ok){b.classList.add('ok');mo+=CONFIG.reward;xp+=5}else b.classList.add('no');hud();persist();
+    if(o.ok){playSfx('correct');b.classList.add('ok');mo+=CONFIG.reward;xp+=5}else{playSfx('wrong');b.classList.add('no')}hud();persist();
     $('#fbx').innerHTML=`<div class="fb pop">${o.ok?'✅ Correct! 💰 +'+rp(CONFIG.reward)+'. '+q.fb:'❌ Not quite. No reward, and this question is now locked.'}</div><div style="margin-top:12px"><button class="btn y" id="ok">Close</button></div>`;$('#ok').onclick=close})}
 function tired(){open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n}</b>You look exhausted, ${me.name}! 😵 Answer the reporter's questions to earn money, then buy food at the Canteen 🍜 to refill your energy.</div></div><div class="row" style="margin-top:14px"><button class="btn" id="ok">OK</button></div>`);$('#ok').onclick=close}
 function shop(msg){
@@ -796,7 +815,7 @@ function showQ(){
   document.querySelectorAll('.opt').forEach(btn=>btn.onclick=()=>{
     const o=opts[+btn.dataset.i];document.querySelectorAll('.opt').forEach(x=>x.disabled=true);
     asked++;sv.cur=null;(sv.res[cur.id]=sv.res[cur.id]||{})[qi]=o.ok?1:0;
-    if(o.ok){btn.classList.add('ok');right++;correct++;streak++;xp+=10+(streak>=3?5:0);gems++;}else{btn.classList.add('no');streak=0;en=Math.max(0,en-CONFIG.wrongCost)}
+    if(o.ok){playSfx('correct');btn.classList.add('ok');right++;correct++;streak++;xp+=10+(streak>=3?5:0);gems++;}else{playSfx('wrong');btn.classList.add('no');streak=0;en=Math.max(0,en-CONFIG.wrongCost)}
     hud();persist();const last=qi===qs.length-1;
     $('#fbx').innerHTML=`<div class="fb pop">${o.ok?'✅ Correct! '+(q.fb||''):'❌ Not quite. 🔒 This question is now locked. 🔋 −'+CONFIG.wrongCost+(en<=0?' You are out of energy! 😵':'')}</div><div style="margin-top:12px"><button class="btn y" id="nx">${last?'Finish mission ✔':'Next ➜'}</button></div>`;
     $('#nx').onclick=()=>last?finishB():(en<=0?tired():(qi++,showQ()));
@@ -877,7 +896,7 @@ function init(){
   $('#go').onclick=startGame;$('#nm').addEventListener('keydown',e=>e.key==='Enter'&&startGame());
 }
 async function startGame(){
-  const go=$('#go');if(go.disabled)return;
+  const go=$('#go');if(go.disabled)return;unlockSfx();
   const saved=saveGet();const name=saved?saved.name:($('#nm').value.trim()||'Player'+Math.floor(Math.random()*90+10)).slice(0,14),room=saved?saved.room:($('#rm').value.trim()||'CLASS-A').toUpperCase().replace(/[^A-Z0-9_-]/g,'')||'CLASS-A';
   lsSet('hh_name',name);go.disabled=true;go.textContent='🎲 Shuffling…';
   const [a]=await Promise.all([saved?Promise.resolve({sch:saved.sch,rl:saved.rl,av:saved.av}):assign(room),new Promise(r=>setTimeout(r,900))]);
