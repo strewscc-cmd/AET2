@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Harapan High Squad – Analytical Exposition</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2b2a4c;--card:#fffdf6;--y:#ffc83d;--g:#4cc26b;--r:#ff6b4a;--b:#3d8bff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Fredoka','Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:#8fd36b}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.hide{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:18px;font-weight:700;font-size:17px;color:#fff;background:var(--g);box-shadow:0 5px 0 #2c8f49;border:3px solid #fff;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #2c8f49}
+.btn.y{background:var(--y);color:var(--ink);box-shadow:0 5px 0 #d99a10}.btn.y:active{box-shadow:0 1px 0 #d99a10}
+.btn.r{background:var(--r);box-shadow:0 5px 0 #c4472b}.btn.gr{background:#e6e2d6;color:var(--ink);box-shadow:0 5px 0 #bdb8a6}
+.btn.b{background:var(--b);box-shadow:0 5px 0 #2563c4}
+/* join screen */
+#join,#reveal{position:fixed;inset:0;overflow:auto;background:linear-gradient(#a9dcff,#dff3ff 55%,#9bdc7a 55%);display:flex;justify-content:center;padding:18px}
+.cloud{position:absolute;background:#fff;border-radius:50px;opacity:.9;animation:drift 40s linear infinite}
+.cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud:before{width:50%;height:140%;left:12%;top:-60%}.cloud:after{width:38%;height:120%;right:12%;top:-40%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.panel{position:relative;width:min(560px,100%);margin:auto;background:var(--card);border:4px solid #fff;border-radius:28px;padding:20px;box-shadow:0 10px 0 rgba(43,42,76,.18),0 20px 40px rgba(0,0,0,.15)}
+.logo{text-align:center;line-height:.95;margin:0 0 6px;font-weight:700;text-shadow:0 4px 0 rgba(43,42,76,.25)}
+.logo b{display:block;font-size:44px;color:var(--y);-webkit-text-stroke:3px #2f4e9a;paint-order:stroke fill}
+.logo i{display:block;font-style:normal;font-size:56px;color:var(--r);-webkit-text-stroke:3px #fff;paint-order:stroke fill}
+.sub{text-align:center;font-weight:600;margin:0 0 14px;opacity:.75}
+label{display:block;font-weight:700;font-size:14px;margin:12px 0 5px}
+input[type=text]{width:100%;padding:12px 14px;border-radius:14px;border:3px solid #e2dcc8;font:inherit;font-weight:600;background:#fff;color:var(--ink);outline:0}
+input[type=text]:focus{border-color:var(--b)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.seg button{padding:10px;border-radius:14px;border:3px solid #e2dcc8;background:#fff;font-weight:700;font-size:14px}
+.seg button.on{border-color:var(--b);background:#e7f0ff}
+.avs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.avs button{border-radius:16px;border:3px solid #e2dcc8;background:#fff;padding:2px 0}
+.avs button.on{border-color:var(--y);background:#fff6d6;transform:scale(1.05)}
+.avs svg{width:100%;height:76px}
+/* game */
+#game{position:fixed;inset:0}
+#world{position:absolute;inset:0;width:100%;height:100%;touch-action:none;background:#8fd36b}
+.hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{pointer-events:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.95);border:3px solid #cfe9ff;border-radius:20px;padding:4px 11px;font-weight:700;font-size:15px;box-shadow:0 3px 0 rgba(43,42,76,.15)}
+.pill.btnp{cursor:pointer}
+.prog{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 48px);left:10px;right:10px;display:flex;justify-content:center;pointer-events:none}
+.prog div{background:rgba(255,255,255,.95);border:3px solid #cfe9ff;border-radius:16px;padding:5px 12px;font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;min-width:200px}
+.bar{flex:1;height:10px;background:#e6edf5;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffc83d,#ff9f1c);transition:width .4s}
+#talkbtn{position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));transform:translateX(-50%);animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
+.emotes{position:absolute;right:10px;bottom:calc(98px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+.emotes button{width:46px;height:46px;border-radius:50%;background:#fff;border:3px solid #cfe9ff;font-size:23px;box-shadow:0 3px 0 rgba(43,42,76,.15)}
+.nav{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.96);border-radius:30px;padding:7px;border:3px solid #cfe9ff;box-shadow:0 6px 0 rgba(43,42,76,.18)}
+.nav button{width:76px;padding:6px 0;border-radius:22px;font-weight:700;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:0}
+.nav button span{font-size:22px;line-height:1.2}.nav button.on{background:#d9ecff}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:78%;background:var(--card);border-radius:28px 28px 0 0;border:4px solid #fff;border-bottom:0;box-shadow:0 -10px 30px rgba(0,0,0,.2);padding:16px 16px calc(100px + env(safe-area-inset-bottom));overflow:auto;max-width:640px;margin:0 auto}
+.sheet h2{margin:0 0 10px;font-size:22px}
+.item{display:flex;align-items:center;gap:12px;background:#fff;border:3px solid #eee6d0;border-radius:18px;padding:9px 12px;margin-bottom:8px;font-weight:600}
+.item.me{background:#e4f1ff;border-color:#9cc9ff}.item.dn{background:#eaf9ee;border-color:#a9e2b7}
+.item small{display:block;font-weight:500;opacity:.7;font-size:12.5px}
+.item .r{margin-left:auto;font-weight:700;white-space:nowrap}
+.item svg{width:40px;height:46px;flex:none}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:6px 0 14px;text-align:center;font-weight:700;font-size:13px}
+.podium div{width:96px}.podium svg{width:64px;height:72px}
+.podium .blk{border-radius:14px 14px 0 0;color:#fff;font-size:26px;padding-top:6px;border:3px solid #fff;border-bottom:0}
+.modal{position:absolute;inset:0;background:rgba(30,30,60,.55);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+.talk{width:min(620px,100%);background:var(--card);border:4px solid #fff;border-radius:28px;padding:16px;box-shadow:0 10px 0 rgba(43,42,76,.2);max-height:94%;overflow:auto}
+.who{display:flex;gap:12px;align-items:flex-end}.who svg{width:70px;height:92px;flex:none}
+.bubble{position:relative;flex:1;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:11px 14px;font-weight:500;line-height:1.35}
+.bubble:before{content:"";position:absolute;left:-12px;bottom:22px;border:8px solid transparent;border-right:12px solid var(--ink);border-left:0}
+.bubble b.nm{display:block;color:var(--b);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+.exc{margin:12px 0 4px;background:#fff6d6;border-left:6px solid var(--y);border-radius:10px;padding:10px 12px;font-style:italic;font-weight:500}
+.q{margin:10px 0;font-weight:700;font-size:18px}
+.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;margin:7px 0;padding:11px 12px;border-radius:16px;border:3px solid #e2dcc8;background:#fff;font-weight:600;box-shadow:0 4px 0 #e2dcc8}
+.opt i{flex:none;width:28px;height:28px;border-radius:50%;background:#eef2ff;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:14px}
+.opt.ok{border-color:#2c9a4a;background:#e3f8e8;box-shadow:0 4px 0 #2c9a4a}.opt.no{border-color:#d9452a;background:#ffe9e4;box-shadow:0 4px 0 #d9452a}
+.fb{margin-top:10px;padding:10px 12px;border-radius:14px;font-weight:600;background:#eef6ff}
+.steps{display:flex;gap:6px;margin-bottom:8px}.steps i{flex:1;height:8px;border-radius:5px;background:#e6e0cc}.steps i.on{background:var(--g)}
+.tip{font-size:12.5px;opacity:.7;margin:10px 0 0;font-weight:500}
+.net{font-size:12px;font-weight:600}
+.chip{display:inline-block;padding:3px 10px;border-radius:12px;font-weight:700;font-size:13px;color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.chips .chip{flex:1;text-align:center;white-space:nowrap}
+.lock{background:#fff6d6;border:3px dashed var(--y);border-radius:16px;padding:10px 12px;font-weight:600;margin-top:10px}
+@media(min-width:700px){.modal{align-items:center}}
+.pop{animation:pop .35s cubic-bezier(.2,1.5,.4,1)}@keyframes pop{from{transform:scale(.6);opacity:0}}
+.vit{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 88px);left:10px;right:10px;display:flex;justify-content:center;pointer-events:none}
+.vit>div{background:rgba(255,255,255,.95);border:3px solid #cfe9ff;border-radius:16px;padding:5px 12px;font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;min-width:200px}
+#enbar{background:linear-gradient(90deg,#4cc26b,#7be08f)}#enbar.low{background:#ff6b4a}
+.press{position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 128px);left:50%;transform:translateX(-50%);display:flex;gap:10px;align-items:center;text-align:left;background:#fff6d6;border:3px solid var(--y);border-radius:18px;padding:8px 14px;font-weight:700;box-shadow:0 4px 0 #d99a10;animation:bob 1s ease-in-out infinite}.press small{display:block;font-weight:600;opacity:.8}.press span{font-size:26px}
+#stealbtn{position:absolute;left:10px;bottom:calc(104px + env(safe-area-inset-bottom))}
+.msg{position:absolute;left:50%;bottom:calc(170px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92%;background:var(--ink);color:#fff;border-radius:16px;padding:10px 16px;font-weight:700;text-align:center;pointer-events:none;z-index:5}
+.mk{animation:mk 1.1s ease-in-out infinite}@keyframes mk{50%{transform:translateY(-6px)}}
+</style>
+</head>
+<body>
+
+<!-- JOIN -->
+<div id="join">
+  <div class="cloud" style="width:120px;height:34px;top:8%;left:0;animation-duration:50s"></div>
+  <div class="cloud" style="width:90px;height:26px;top:20%;left:0;animation-duration:70s;animation-delay:-30s"></div>
+  <div class="panel pop">
+    <h1 class="logo"><b>HARAPAN HIGH</b><i>SQUAD</i></h1>
+    <p class="sub">Analytical Exposition · Multiplayer School Quest</p>
+    <label for="nm">Your nickname</label>
+    <input type="text" id="nm" maxlength="14" placeholder="e.g. Aisyah" autocomplete="off">
+    <div class="row">
+      <div><label for="rm">Class code</label><input type="text" id="rm" maxlength="12" value="CLASS-A" autocomplete="off"></div>
+    </div>
+    <label>Choose your character</label>
+    <div class="avs" id="avs"></div>
+    <div class="item" style="margin-top:14px"><span style="font-size:28px">🎲</span><div>Random assignment<small>The system will randomly give you a school, a topic and a role.</small></div></div>
+    <div class="row" style="margin-top:18px;align-items:center">
+      <button class="btn y" id="go" style="flex:3">▶ Start Game</button>
+      <button class="btn gr" id="cfgbtn" style="flex:1" title="Settings">⚙️</button>
+    </div>
+    <p class="tip">Everyone who enters the same class code plays together in real time, each from a different school.</p>
+  </div>
+</div>
+
+<div id="reveal" class="hide"></div>
+
+<!-- GAME -->
+<div id="game" class="hide">
+  <svg id="world" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice"><g id="map"></g><g id="ents"></g></svg>
+  <div class="hud">
+    <div class="pills">
+      <div class="pill">⚡ <span id="xp">0</span> XP</div>
+      <div class="pill">💎 <span id="gem">0</span></div>
+      <div class="pill">🔥 <span id="stk">0</span></div>
+    </div>
+    <div class="pills">
+      <div class="pill btnp" id="peerpill">👥 <span id="np">1</span></div>
+      <div class="pill btnp" id="cfgbtn2">⚙️</div>
+    </div>
+  </div>
+  <div class="prog"><div><span id="sch">🏫</span> · Missions <span id="pg">0/9</span><span class="bar"><i id="pgbar"></i></span></div></div>
+  <div class="vit"><div>🔋<span class="bar"><i id="enbar"></i></span><span id="en">100</span><span>💰 <span id="mo">Rp0</span></span></div></div>
+  <button class="press hide" id="press"><span>📰</span><div>Reporter Alex wants an interview!<small>Quick grammar question · 💰 Rp5.000</small></div></button>
+  <button class="btn r hide" id="stealbtn">🦹 Steal</button>
+  <button class="btn y hide" id="talkbtn">💬 Talk</button>
+  <div class="emotes"><button data-e="👋">👋</button><button data-e="😄">😄</button><button data-e="👍">👍</button><button data-e="🤔">🤔</button></div>
+  <div class="nav">
+    <button id="n-map" class="on"><span>🗺️</span>Map</button>
+    <button id="n-mis"><span>📋</span>Missions</button>
+    <button id="n-rank"><span>🏆</span>Ranking</button>
+  </div>
+  <div class="sheet hide" id="sheet"></div>
+  <div class="modal hide" id="modal"><div class="talk pop" id="talk"></div></div>
+  <div class="msg hide" id="msg"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="cfg" class="hide" style="position:fixed;inset:0;z-index:50;background:rgba(30,30,60,.6);display:flex;align-items:center;justify-content:center;padding:14px">
+  <div class="panel" style="max-height:92%;overflow:auto">
+    <h2 style="margin:0 0 4px">⚙️ Settings</h2>
+    <label for="fb">Realtime multiplayer URL (Firebase Realtime Database)</label>
+    <input type="text" id="fb" placeholder="https://your-project-default-rtdb.firebaseio.com">
+    <p class="tip">Leave empty for <b>local mode</b>: players in other tabs of the same browser can see each other. For a real class on different devices, paste a Firebase Realtime Database URL (rules: read/write allowed for the quiz path).</p>
+    <label for="gas">Google Apps Script URL (teacher score sheet, optional)</label>
+    <input type="text" id="gas" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="row" style="margin-top:16px"><button class="btn gr" id="cfgx">Cancel</button><button class="btn" id="cfgs">Save &amp; reload</button></div>
+    <div class="row" style="margin-top:12px"><button class="btn r" id="rst" style="font-size:14px">🗑️ Reset progress on this device (teacher PIN)</button></div>
+  </div>
+</div>
+
+<script>
+const CONFIG={firebase:'https://analyticalexposition2-default-rtdb.asia-southeast1.firebasedatabase.app/',gas:'',resetPin:'2026',energyMax:100,wrongCost:10,reward:5000,reporterEvery:[3,5],stealAmt:3000,stealCooldown:20}; // teacher: paste your Firebase Realtime Database URL and Apps Script URL here (optional, can also be set in ⚙️)
+const QB={
+            makeup: {
+                A: [
+                    {
+                        excerpt: "Schools should reconsider strict make-up restrictions. Limited use may support students' self-expression, while clear boundaries can preserve a focused learning environment.",
+                        q: "Which sentence best states the writer's thesis?",
+                        options: [
+                            "Limited use may support students' self-expression.",
+                            "Schools should reconsider strict make-up restrictions.",
+                            "Clear boundaries can preserve a focused learning environment.",
+                            "Students have different preferences about appearance."
+                        ],
+                        answer: 1,
+                        fb: "A thesis presents the central position or main recommendation, not just one supporting reason."
+                    },
+                    {
+                        excerpt: "A student says, \"I believe the current rule does not consider students' different circumstances.\"",
+                        q: "Which word functions as a mental verb?",
+                        options: ["current", "rule", "believe", "circumstances"],
+                        answer: 2,
+                        fb: "'Believe' expresses a mental thought, feeling, or opinion."
+                    },
+                    {
+                        excerpt: "A survey of 200 students found that 120 supported allowing light make-up.",
+                        q: "Which statement is a fact based on the information?",
+                        options: [
+                            "Light make-up makes students more confident.",
+                            "Most teachers should support the proposal.",
+                            "60% of the surveyed students supported allowing light make-up.",
+                            "The current rule is unreasonable."
+                        ],
+                        answer: 2,
+                        fb: "120 out of 200 equals 60%. This is a verifiable factual statistic."
+                    },
+                    {
+                        excerpt: "Which sentence uses evaluative language to criticise the existing rule?",
+                        q: "Choose the sentence with evaluative language:",
+                        options: [
+                            "The school reviews its regulations annually.",
+                            "The current restriction is excessively rigid.",
+                            "Students completed the survey last Friday.",
+                            "The regulation contains four paragraphs."
+                        ],
+                        answer: 1,
+                        fb: "'Excessively rigid' is an evaluative judgment that criticises the rule."
+                    },
+                    {
+                        excerpt: "The school currently prohibits visible make-up. _____ several students have requested a formal review of the regulation.",
+                        q: "Choose the most logical connective:",
+                        options: ["As a result", "Nevertheless", "For instance", "Similarly"],
+                        answer: 0,
+                        fb: "'As a result' shows cause and effect: the restriction led students to request a review."
+                    },
+                    {
+                        excerpt: "A counsellor states that appearance-related policies should consider adolescent well-being.",
+                        q: "Which evidence would most directly strengthen the counsellor's claim?",
+                        options: [
+                            "A catalogue of cosmetic products",
+                            "A study examining appearance pressure and adolescent well-being",
+                            "A list of school subjects",
+                            "A photograph of the school entrance"
+                        ],
+                        answer: 1,
+                        fb: "A study examining appearance pressure directly connects to adolescent well-being."
+                    },
+                    {
+                        excerpt: "The counsellor said, \"Students need clear and fair guidelines.\"",
+                        q: "Which is the correct reported-speech form?",
+                        options: [
+                            "The counsellor said that students need clear and fair guidelines.",
+                            "The counsellor said that students needed clear and fair guidelines.",
+                            "The counsellor told that students needed clear and fair guidelines.",
+                            "The counsellor said students needing clear and fair guidelines."
+                        ],
+                        answer: 1,
+                        fb: "With a past reporting verb ('said'), present tense 'need' backshifts to past 'needed'."
+                    },
+                    {
+                        excerpt: "A parent argues that allowing make-up may increase family expenses.",
+                        q: "Which response is the most effective rebuttal?",
+                        options: [
+                            "Parents should not interfere in school policies.",
+                            "All students can buy expensive products.",
+                            "The concern is understandable; however, the policy can limit make-up to optional, affordable products.",
+                            "Make-up has nothing to do with family expenses."
+                        ],
+                        answer: 2,
+                        fb: "An effective rebuttal acknowledges the concern and provides a reasonable, practical safeguard."
+                    },
+                    {
+                        excerpt: "Which conclusion best reiterates support for a limited make-up policy?",
+                        q: "Select the best reiteration/conclusion:",
+                        options: [
+                            "In conclusion, schools should allow light make-up under clear rules that balance expression, discipline, and family circumstances.",
+                            "Many students use different cosmetic products.",
+                            "Parents and teachers have discussed the issue.",
+                            "School regulations are sometimes revised."
+                        ],
+                        answer: 0,
+                        fb: "A strong reiteration restates the thesis while synthesizing the main arguments."
+                    },
+                    {
+                        excerpt: "The policy may support self-expression; _____, it should include limits to prevent excessive use.",
+                        q: "Choose the most appropriate contrastive connective:",
+                        options: ["Therefore", "For example", "However", "Similarly"],
+                        answer: 2,
+                        fb: "'However' introduces a qualification or contrasting consideration."
+                    }
+                ],
+                B: [
+                    {
+                        excerpt: "A complete ban may appear simple to enforce. However, a carefully defined allowance for subtle make-up could respect students' preferences without removing school standards.",
+                        q: "What is the main position of the writer?",
+                        options: [
+                            "A complete ban is always easy to enforce.",
+                            "Students should decide all school regulations.",
+                            "Schools should consider allowing subtle make-up within clear standards.",
+                            "School standards are unnecessary."
+                        ],
+                        answer: 2,
+                        fb: "The main thesis recommends considering a subtle allowance within clear standards."
+                    },
+                    {
+                        excerpt: "Which sentence contains a mental verb?",
+                        q: "Identify the sentence with a mental verb:",
+                        options: [
+                            "The principal announced the revised regulation.",
+                            "Several students consider the restriction unfair.",
+                            "The committee held a meeting yesterday.",
+                            "The survey included 200 participants."
+                        ],
+                        answer: 1,
+                        fb: "'Consider' is a mental verb expressing a mental judgment or opinion."
+                    },
+                    {
+                        excerpt: "The school handbook states: \"Visible make-up is not permitted during lessons.\"",
+                        q: "Which statement is directly verifiable from this source?",
+                        options: [
+                            "The handbook prohibits visible make-up during lessons.",
+                            "The rule makes students unhappy.",
+                            "The school should change the handbook.",
+                            "Visible make-up harms academic achievement."
+                        ],
+                        answer: 0,
+                        fb: "It directly and accurately restates what is written in the source handbook."
+                    },
+                    {
+                        excerpt: "Which phrase expresses a positive evaluation of a proposed policy?",
+                        q: "Choose the positive evaluative language:",
+                        options: [
+                            "An unnecessarily strict restriction",
+                            "A poorly considered regulation",
+                            "A balanced and practical guideline",
+                            "An unfair limitation"
+                        ],
+                        answer: 2,
+                        fb: "'Balanced and practical' provides a positive evaluation."
+                    },
+                    {
+                        excerpt: "A survey reports 72 responses in favour out of 120 respondents.",
+                        q: "What percentage does this represent?",
+                        options: ["45%", "50%", "60%", "72%"],
+                        answer: 2,
+                        fb: "72 divided by 120 equals 0.60, or 60%."
+                    }
+                ],
+                C: [
+                    {
+                        excerpt: "Appearance rules are part of school discipline, but they should also be reasonable. Permitting minimal make-up under specific conditions may prevent unnecessary conflict.",
+                        q: "Which option best represents the thesis?",
+                        options: [
+                            "Appearance rules are part of school discipline.",
+                            "Schools should permit minimal make-up under specific conditions.",
+                            "Students sometimes disagree with teachers.",
+                            "Unnecessary conflict occurs at school."
+                        ],
+                        answer: 1,
+                        fb: "The thesis states the writer's central recommendation."
+                    },
+                    {
+                        excerpt: "Which sentence uses a mental verb to express a judgement?",
+                        q: "Identify the sentence with a mental verb:",
+                        options: [
+                            "The committee published its decision.",
+                            "Students entered the hall at 8 a.m.",
+                            "Many parents believe that clear limits are necessary.",
+                            "The school collected the forms."
+                        ],
+                        answer: 2,
+                        fb: "'Believe' expresses a mental judgement."
+                    },
+                    {
+                        excerpt: "A school survey reports that 84 out of 140 respondents prefer clearer make-up guidelines.",
+                        q: "Which statement is supported by the data?",
+                        options: [
+                            "60% of respondents prefer clearer guidelines.",
+                            "All students want to wear make-up.",
+                            "Clear guidelines will improve academic results.",
+                            "Parents oppose the proposal."
+                        ],
+                        answer: 0,
+                        fb: "84 out of 140 equals 60%."
+                    }
+                ]
+            },
+            electricity: {
+                A: [
+                    {
+                        excerpt: "Schools should adopt consistent energy-saving practices. Switching off unused equipment can reduce waste and help manage operating costs.",
+                        q: "Which sentence states the thesis?",
+                        options: [
+                            "Switching off unused equipment can reduce waste.",
+                            "Schools should adopt consistent energy-saving practices.",
+                            "Energy is used in classrooms.",
+                            "Operating costs vary each month."
+                        ],
+                        answer: 1,
+                        fb: "The thesis expresses the writer's overall position and recommendation."
+                    },
+                    {
+                        excerpt: "Which sentence contains a mental verb?",
+                        q: "Find the sentence with a mental verb:",
+                        options: [
+                            "The technician inspected the air conditioners.",
+                            "Students switched off the lights.",
+                            "Teachers believe that energy conservation requires shared responsibility.",
+                            "The electricity bill arrived yesterday."
+                        ],
+                        answer: 2,
+                        fb: "'Believe' is a mental verb indicating an opinion or thought process."
+                    },
+                    {
+                        excerpt: "The monthly electricity bill increased by 30% last semester.",
+                        q: "Which statement is a fact based on this information?",
+                        options: [
+                            "The school wastes electricity carelessly.",
+                            "The school's monthly electricity bill increased by 30% last semester.",
+                            "Students never switch off the lights.",
+                            "The school should ban air conditioners."
+                        ],
+                        answer: 1,
+                        fb: "It directly states verifiable data from the record."
+                    },
+                    {
+                        excerpt: "Which expression gives a negative evaluation of the school's current habits?",
+                        q: "Identify the evaluative language:",
+                        options: [
+                            "Unnecessary and wasteful electricity use",
+                            "Monthly electricity consumption",
+                            "Classroom equipment inventory",
+                            "Regular maintenance schedule"
+                        ],
+                        answer: 0,
+                        fb: "'Unnecessary and wasteful' expresses a negative value judgement."
+                    },
+                    {
+                        excerpt: "The electricity bill rose significantly. _____, the committee proposed switching off air conditioners during breaks.",
+                        q: "Choose the most logical connective:",
+                        options: ["In contrast", "As a result", "Nevertheless", "Similarly"],
+                        answer: 1,
+                        fb: "'As a result' introduces the proposal as a consequence of the rising bill."
+                    },
+                    {
+                        excerpt: "The technician said, \"The school should inspect its electrical equipment regularly.\"",
+                        q: "Choose the correct reported speech:",
+                        options: [
+                            "The technician said the school should inspected its equipment regularly.",
+                            "The technician told that the school should inspect its equipment regularly.",
+                            "The technician said that the school should inspect its equipment regularly.",
+                            "The technician said that the school should inspecting its equipment regularly."
+                        ],
+                        answer: 2,
+                        fb: "'Modal should' is followed by base form 'inspect' in reported speech."
+                    },
+                    {
+                        excerpt: "Some teachers argue that switching off air conditioners during every break may make classrooms uncomfortable.",
+                        q: "Which response is the strongest rebuttal?",
+                        options: [
+                            "Comfort is irrelevant at school.",
+                            "Air conditioners should never be switched off.",
+                            "Break-time settings can be adjusted while unused rooms and equipment are switched off.",
+                            "Teachers should stop using classrooms."
+                        ],
+                        answer: 2,
+                        fb: "It addresses the comfort concern while preserving the energy-saving goal."
+                    }
+                ],
+                B: [
+                    {
+                        excerpt: "An increase in electricity costs should prompt schools to examine how energy is used. A practical conservation programme can reduce avoidable consumption without disrupting lessons.",
+                        q: "What is the writer's main position?",
+                        options: [
+                            "Electricity costs should never increase.",
+                            "Schools should examine energy use and introduce practical conservation measures.",
+                            "Lessons should be shortened to save electricity.",
+                            "All electrical equipment should be removed."
+                        ],
+                        answer: 1,
+                        fb: "The thesis recommends examining energy use and adopting practical conservation measures."
+                    },
+                    {
+                        excerpt: "Which sentence contains a mental verb?",
+                        q: "Find the sentence with a mental verb:",
+                        options: [
+                            "The committee reviewed the bill.",
+                            "The school installed new lamps.",
+                            "Students think that simple energy-saving habits are worthwhile.",
+                            "The technician recorded the meter reading."
+                        ],
+                        answer: 2,
+                        fb: "'Think' is a mental verb."
+                    },
+                    {
+                        excerpt: "Ten air conditioners are listed in the school's equipment inventory.",
+                        q: "Which statement is verifiable?",
+                        options: [
+                            "Ten air conditioners are listed in the school inventory.",
+                            "The school uses too many air conditioners.",
+                            "The classrooms are always too cold.",
+                            "The school should replace every air conditioner."
+                        ],
+                        answer: 0,
+                        fb: "It directly reports the recorded inventory number."
+                    }
+                ],
+                C: [
+                    {
+                        excerpt: "Energy conservation should not depend on occasional reminders. Schools need clear routines so that students and staff use electricity responsibly every day.",
+                        q: "Which option best expresses the thesis?",
+                        options: [
+                            "Schools need clear routines for responsible daily electricity use.",
+                            "Students sometimes forget classroom rules.",
+                            "Electricity is essential for modern education.",
+                            "Reminders are occasionally announced."
+                        ],
+                        answer: 0,
+                        fb: "The thesis states the recommendation for clear daily routines."
+                    },
+                    {
+                        excerpt: "Which sentence uses a mental verb?",
+                        q: "Identify the sentence with a mental verb:",
+                        options: [
+                            "The school measured electricity consumption.",
+                            "The caretaker switched off the lights.",
+                            "Many students realise that small actions can reduce energy waste.",
+                            "The principal posted a reminder."
+                        ],
+                        answer: 2,
+                        fb: "'Realise' is a mental verb."
+                    },
+                    {
+                        excerpt: "The committee records that the monthly bill rose by 30%.",
+                        q: "Which statement is an opinion?",
+                        options: [
+                            "The bill rose by 30%.",
+                            "The committee recorded the increase.",
+                            "The increase was recorded last semester.",
+                            "The school's energy habits are clearly irresponsible."
+                        ],
+                        answer: 3,
+                        fb: "'Irresponsible' is an evaluative opinion, not a directly measurable statistic."
+                    }
+                ]
+            }
+        };
+Object.assign(QB,{"mbg": {"A": [{"excerpt": "Free school meals can improve nutrition, but only with strict food-safety supervision. Schools should support the program while demanding clear safety standards.", "q": "Which sentence is the thesis?", "options": ["Schools should support the program while demanding clear safety standards.", "Free school meals can improve nutrition.", "Food safety is supervised in some kitchens.", "Students eat lunch at school."], "answer": 0, "fb": "The thesis states the writer's position or recommendation, not just one supporting idea."}, {"excerpt": "", "q": "Which sentence contains a mental verb?", "options": ["Many parents believe the program reduces family expenses.", "The kitchen delivered 400 meals.", "Students queued at 10 a.m.", "The menu included rice and vegetables."], "answer": 0, "fb": "'Believe' expresses a thought or opinion."}, {"excerpt": "A school has 540 students. On Monday, 459 of them received a meal.", "q": "Which statement is a fact?", "options": ["85% of the students received a meal on Monday.", "The meals are always delicious.", "Every student loves the program.", "The program is a waste of money."], "answer": 0, "fb": "459 ÷ 540 = 0.85, a verifiable figure."}, {"excerpt": "", "q": "Which phrase is evaluative language that criticises the program?", "options": ["a poorly supervised and risky system", "a kitchen near the school", "a daily lunch menu", "a list of twelve suppliers"], "answer": 0, "fb": "'Poorly supervised and risky' is a negative judgement."}, {"excerpt": "Several students felt sick after lunch. _____ the school asked the kitchen to explain its hygiene procedure.", "q": "Choose the most logical connective:", "options": ["As a result,", "For example,", "Similarly,", "In addition,"], "answer": 0, "fb": "The request is a result of students feeling sick."}, {"excerpt": "The program helps families save money; _____ it must not reduce food safety.", "q": "Choose the best contrastive connective:", "options": ["however,", "therefore,", "for instance,", "similarly,"], "answer": 0, "fb": "'However' adds a contrasting condition."}, {"excerpt": "A teacher claims that free meals improve concentration in class.", "q": "Which evidence would best support the claim?", "options": ["A comparison of concentration scores before and after the program", "A photo of the canteen", "The price of rice at the market", "A list of school clubs"], "answer": 0, "fb": "Good evidence directly connects to the claim."}, {"excerpt": "The speaker said, \"The kitchen delivers meals every day.\"", "q": "Choose the correct reported speech:", "options": ["The speaker said that the kitchen delivered meals every day.", "The speaker said that the kitchen deliver meals every day.", "The speaker told that the kitchen delivered meals every day.", "The speaker said the kitchen delivering meals every day."], "answer": 0, "fb": "After 'said', present tense backshifts to past tense."}, {"excerpt": "A critic argues that the program is too expensive.", "q": "Which is the most effective rebuttal?", "options": ["The cost is high; however, careful budgeting and audits can make sure the money is used well.", "Cost is not important.", "Critics should stay silent.", "Nobody pays for it."], "answer": 0, "fb": "A good rebuttal acknowledges the concern and offers a reasonable answer."}, {"excerpt": "", "q": "Choose the best reiteration (conclusion):", "options": ["In conclusion, students should support free school meals as long as safety, transparency and quality are guaranteed.", "Many students eat lunch.", "Rice is a common food.", "The kitchen is near the school."], "answer": 0, "fb": "A reiteration restates the thesis and sums up the arguments."}, {"excerpt": "Schools _____ publish the weekly menu so parents can check it.", "q": "Which modal is best for a strong recommendation?", "options": ["should", "might", "used to", "could have"], "answer": 0, "fb": "'Should' expresses a recommendation."}, {"excerpt": "", "q": "Which paragraphs present the arguments in an analytical exposition?", "options": ["The paragraphs after the thesis", "The title only", "The final sentence only", "The signature"], "answer": 0, "fb": "Arguments (point + elaboration) come after the thesis."}, {"excerpt": "", "q": "Which sentence is an opinion?", "options": ["The lunch menu is too boring.", "The kitchen opens at 5 a.m.", "Each student receives one portion.", "The school has 540 students."], "answer": 0, "fb": "'Too boring' is a personal judgement."}, {"excerpt": "In a survey of 250 parents, 175 supported the program with conditions.", "q": "What percentage is this?", "options": ["70%", "60%", "75%", "175%"], "answer": 0, "fb": "175 ÷ 250 = 0.70."}, {"excerpt": "Some students refuse the meal because of its taste. Others worry about safety. Therefore, schools should involve students in menu evaluation.", "q": "What is the writer's main recommendation?", "options": ["Schools should involve students in menu evaluation.", "Some students refuse the meal.", "Taste is important.", "Safety is a worry."], "answer": 0, "fb": "The recommendation follows 'Therefore'."}, {"excerpt": "The school must be transparent. _____ parents will trust the program more.", "q": "Choose the connective that shows result:", "options": ["Consequently,", "Meanwhile,", "On the other hand,", "For instance,"], "answer": 0, "fb": "'Consequently' introduces a result."}, {"excerpt": "", "q": "Which sentence presents a counter-argument the writer will answer?", "options": ["Some critics say the program is too risky.", "In conclusion, the program should continue.", "Schools should supervise kitchens.", "The writer agrees completely."], "answer": 0, "fb": "A counter-argument states the opposing view."}, {"excerpt": "", "q": "Which source is most reliable for data on food-safety inspections?", "options": ["An official inspection report from the health office", "An anonymous social media post", "A friend's rumour", "An advertisement"], "answer": 0, "fb": "Reliable evidence comes from credible, verifiable sources."}]}, "trash": {"A": [{"excerpt": "Taking trash home can teach responsibility, but the rule alone will not solve school waste. Schools should combine it with sorting and recycling facilities.", "q": "Which sentence is the thesis?", "options": ["Schools should combine the rule with sorting and recycling facilities.", "Taking trash home can teach responsibility.", "School waste is a problem.", "Trash is made of many materials."], "answer": 0, "fb": "The thesis is the writer's overall position."}, {"excerpt": "", "q": "Which sentence contains a mental verb?", "options": ["Many teachers think the rule builds responsibility.", "The cleaner sweeps the yard.", "Bins stand near the canteen.", "Students collected thirty bags."], "answer": 0, "fb": "'Think' expresses a mental opinion."}, {"excerpt": "Before the rule, the school filled 40 bags of trash daily. After one month it filled 28 bags.", "q": "Which statement is a fact?", "options": ["Daily trash fell from 40 bags to 28 bags.", "The rule is perfect.", "Students hate carrying trash.", "The school will be spotless forever."], "answer": 0, "fb": "It is a measurable, verifiable statement."}, {"excerpt": "", "q": "Which phrase is positive evaluative language?", "options": ["a simple and effective habit", "a bag of plastic wrappers", "a rule announced on Monday", "a bin beside the gate"], "answer": 0, "fb": "'Simple and effective' judges the habit positively."}, {"excerpt": "Students carry their trash home. _____ the school bins stay cleaner.", "q": "Choose the most logical connective:", "options": ["As a result,", "In contrast,", "For example,", "Instead,"], "answer": 0, "fb": "Cleaner bins are the result."}, {"excerpt": "The rule teaches responsibility; _____ it may be unhygienic if trash is carried in school bags.", "q": "Choose the best contrastive connective:", "options": ["however,", "so,", "likewise,", "for example,"], "answer": 0, "fb": "'However' introduces a contrasting point."}, {"excerpt": "The writer claims that the rule reduces waste at school.", "q": "Which evidence is the strongest?", "options": ["Daily trash weight records from before and after the rule", "A poster about recycling", "The number of classrooms", "A story about a school trip"], "answer": 0, "fb": "Direct data supports the claim."}, {"excerpt": "She said, \"Students bring plastic bags every day.\"", "q": "Choose the correct reported speech:", "options": ["She said that students brought plastic bags every day.", "She said that students bring plastic bags every day.", "She told that students brought plastic bags every day.", "She said students bringing plastic bags every day."], "answer": 0, "fb": "Backshift: bring → brought."}, {"excerpt": "A student argues that trash in school bags smells bad.", "q": "Which is the most effective rebuttal?", "options": ["The concern is valid; however, students can use sealed pouches to carry their trash.", "Smell is not a problem.", "Students should not complain.", "Bags never smell."], "answer": 0, "fb": "A rebuttal acknowledges the concern and gives a practical answer."}, {"excerpt": "", "q": "Choose the best reiteration (conclusion):", "options": ["In conclusion, schools should apply the take-home rule together with sorting facilities to reduce waste effectively.", "Many students buy snacks.", "Trash is everywhere.", "The rule began in March."], "answer": 0, "fb": "It restates the thesis and summarises the arguments."}, {"excerpt": "Schools _____ provide separate bins for plastic and paper.", "q": "Which modal is best for a recommendation?", "options": ["should", "may have", "used to", "would rather"], "answer": 0, "fb": "'Should' gives a recommendation."}, {"excerpt": "Daily trash fell from 40 bags to 28 bags.", "q": "What is the percentage decrease?", "options": ["30%", "12%", "40%", "70%"], "answer": 0, "fb": "12 ÷ 40 = 0.30."}, {"excerpt": "", "q": "Which sentence is an opinion?", "options": ["Carrying trash home is annoying.", "The school has 30 classrooms.", "The rule started in March.", "Students produce plastic wrappers."], "answer": 0, "fb": "'Annoying' is a personal feeling."}, {"excerpt": "", "q": "Which sentence shows the writer opposes the rule?", "options": ["The take-home rule is an inefficient way to reduce school waste.", "The rule is easy to apply.", "The rule has helped many schools.", "The rule teaches discipline."], "answer": 0, "fb": "'Inefficient' is a negative evaluation of the rule."}, {"excerpt": "The rule teaches responsibility.", "q": "Which is the best elaboration of this point?", "options": ["When students handle their own waste, they become more careful about what they buy and throw away.", "Trash is made of many materials.", "The principal announced the rule.", "Some bins are blue."], "answer": 0, "fb": "An elaboration explains and supports the point."}, {"excerpt": "", "q": "Which sentence presents a counter-argument to the rule?", "options": ["Some parents say carrying trash home is unhygienic.", "Students should reduce plastic.", "The writer supports recycling.", "Waste is a global issue."], "answer": 0, "fb": "A counter-argument gives the opposing view."}, {"excerpt": "The rule reduces waste. _____ it encourages students to use reusable bottles.", "q": "Choose the connective that adds an argument:", "options": ["Moreover,", "However,", "Otherwise,", "In contrast,"], "answer": 0, "fb": "'Moreover' adds another supporting point."}, {"excerpt": "", "q": "Which source is most reliable for waste data?", "options": ["Waste records kept by the school cleaning team", "A rumour in the canteen", "A funny meme", "An old poster"], "answer": 0, "fb": "Reliable data comes from verifiable records."}]}, "phone": {"A": [{"excerpt": "A total ban ignores the educational value of phones, but unlimited use harms focus. Schools should limit smartphone use during lessons while allowing it for learning activities.", "q": "Which sentence is the thesis?", "options": ["Schools should limit smartphone use during lessons while allowing it for learning activities.", "A total ban ignores the educational value of phones.", "Unlimited use harms focus.", "Students bring phones to school."], "answer": 0, "fb": "The thesis states the writer's overall recommendation."}, {"excerpt": "", "q": "Which sentence contains a mental verb?", "options": ["Several teachers feel that phones distract students.", "The bell rang at 7 a.m.", "Students put phones in a box.", "The rule appears in the handbook."], "answer": 0, "fb": "'Feel' expresses a mental opinion."}, {"excerpt": "In a class of 36 students, 27 admitted checking messages during lessons.", "q": "Which statement is a fact?", "options": ["75% of the students admitted checking messages during lessons.", "Phones are useless.", "Students cannot focus.", "All teachers hate phones."], "answer": 0, "fb": "27 ÷ 36 = 0.75."}, {"excerpt": "", "q": "Which phrase is evaluative language criticising a ban?", "options": ["an unrealistic and overly strict ban", "a rule in the handbook", "a phone locker", "a ban starting on Monday"], "answer": 0, "fb": "'Unrealistic and overly strict' is a negative judgement."}, {"excerpt": "Students check notifications constantly. _____ they miss important explanations.", "q": "Choose the most logical connective:", "options": ["As a result,", "On the contrary,", "Likewise,", "For instance,"], "answer": 0, "fb": "Missing explanations is the result."}, {"excerpt": "Phones can distract students; _____ they can also help students look up information.", "q": "Choose the best contrastive connective:", "options": ["however,", "therefore,", "because,", "for example,"], "answer": 0, "fb": "'However' contrasts the two ideas."}, {"excerpt": "The writer claims that phones reduce concentration in class.", "q": "Which evidence would best support the claim?", "options": ["A study comparing test scores of students with and without phones in class", "A list of phone brands", "A photo of a new phone", "The price of data packages"], "answer": 0, "fb": "The evidence must be directly relevant."}, {"excerpt": "The teacher said, \"Students need to focus.\"", "q": "Choose the correct reported speech:", "options": ["The teacher said that students needed to focus.", "The teacher said that students need to focus.", "The teacher told that students needed to focus.", "The teacher said students needing to focus."], "answer": 0, "fb": "Backshift: need → needed."}, {"excerpt": "A student argues that phones are needed for emergencies.", "q": "Which is the most effective rebuttal?", "options": ["Emergencies matter; however, students can keep phones in a locker and use them when needed.", "Emergencies never happen.", "Students should not talk to parents.", "Phones are always dangerous."], "answer": 0, "fb": "A rebuttal acknowledges the concern and offers a workable solution."}, {"excerpt": "", "q": "Choose the best reiteration (conclusion):", "options": ["In conclusion, schools should regulate smartphone use during lessons, not ban it completely, so students can learn safely and effectively.", "Many students own phones.", "Phones are made in factories.", "Lessons start at 7 a.m."], "answer": 0, "fb": "It restates the thesis and sums up the arguments."}, {"excerpt": "Teachers _____ allow phones only for research tasks.", "q": "Which modal is best for a recommendation?", "options": ["should", "might have", "used to", "can't have"], "answer": 0, "fb": "'Should' gives a recommendation."}, {"excerpt": "", "q": "Which sentence is an opinion?", "options": ["Smartphones are the biggest problem in education.", "27 of 36 students own phones.", "The school has a phone locker.", "The rule was introduced in 2026."], "answer": 0, "fb": "'The biggest problem' is a judgement."}, {"excerpt": "", "q": "Which sentence supports a total ban?", "options": ["A complete ban would remove distractions entirely.", "Phones can support research tasks.", "Students use dictionaries on phones.", "Rules should be flexible."], "answer": 0, "fb": "It argues in favour of a full ban."}, {"excerpt": "In a survey, 18 of 30 teachers supported limited phone use.", "q": "What percentage is this?", "options": ["60%", "18%", "30%", "50%"], "answer": 0, "fb": "18 ÷ 30 = 0.60."}, {"excerpt": "Phones can support learning.", "q": "Which is the best elaboration of this point?", "options": ["Students can use dictionary and note-taking apps to understand new vocabulary during English lessons.", "Phones are made in factories.", "Some phones are expensive.", "Students like games."], "answer": 0, "fb": "An elaboration explains how the point is true."}, {"excerpt": "", "q": "Which sentence presents a counter-argument to restrictions?", "options": ["Some students argue that limits make them feel distrusted.", "Schools should create a phone policy.", "Phones have cameras.", "The writer recommends lockers."], "answer": 0, "fb": "A counter-argument states the opposing view."}, {"excerpt": "Phones help students research. _____ they give quick access to online dictionaries.", "q": "Choose the connective that adds an argument:", "options": ["Moreover,", "However,", "Otherwise,", "Instead,"], "answer": 0, "fb": "'Moreover' adds a supporting point."}, {"excerpt": "", "q": "Which source is most reliable for data on phone use?", "options": ["A school survey with clear methods and numbers", "A rumour from another class", "An advertisement for phones", "A chain message"], "answer": 0, "fb": "Reliable data comes from verifiable research."}]}});
+QB.electricity.D=[{"excerpt": "The school's electricity bill was Rp10,000,000 in March and Rp13,000,000 in September.", "q": "What is the percentage increase?", "options": ["30%", "3%", "13%", "23%"], "answer": 0, "fb": "3,000,000 ÷ 10,000,000 = 0.30."}, {"excerpt": "A teacher argues that turning off air conditioners makes classes uncomfortable.", "q": "Which is the most effective rebuttal?", "options": ["The concern is understandable; however, setting the temperature at 25°C and using fans can keep rooms comfortable.", "Comfort is not important.", "Teachers should not talk about this.", "Classes are never hot."], "answer": 0, "fb": "A rebuttal acknowledges the concern and offers a solution."}, {"excerpt": "", "q": "Choose the best reiteration (conclusion):", "options": ["In conclusion, schools should adopt consistent energy-saving habits to cut costs and protect the environment.", "Many rooms have lights.", "Electricity is invisible.", "The bill arrives monthly."], "answer": 0, "fb": "It restates the thesis and sums up the arguments."}, {"excerpt": "He said, \"We need to switch off the lights.\"", "q": "Choose the correct reported speech:", "options": ["He said that they needed to switch off the lights.", "He said that they need to switch off the lights.", "He told that they needed to switch off the lights.", "He said they needing to switch off the lights."], "answer": 0, "fb": "Backshift: need → needed."}, {"excerpt": "The school wastes power in empty rooms. _____ the bill keeps rising.", "q": "Choose the most logical connective:", "options": ["Consequently,", "For example,", "In contrast,", "Likewise,"], "answer": 0, "fb": "A rising bill is the result of wasted power."}];
+
+const X=(t,l)=>l.forEach(([e,q,o,a,f])=>(QB[t].Z=QB[t].Z||[]).push({excerpt:e,q,options:o,answer:a,fb:f}));
+const TH="Which sentence is the thesis?",MV="Which sentence contains a mental verb?",CN="Choose the most logical connective:",RB="Which is the most effective rebuttal?",RS="Choose the correct reported speech:",PC="What percentage is this?",FT="Which statement is a fact?",OP="Which sentence is an opinion?";
+X('makeup',[["Make-up should not be banned outright. A clear, limited allowance would respect self-expression while protecting discipline. Banning it entirely only creates resentment.",TH,["Banning it entirely only creates resentment.","Discipline is protected in schools.","Students dislike rules.","Make-up should not be banned outright."],3,"The thesis states the writer's position."],
+[null,MV,["Teachers think that natural make-up is acceptable.","The students wore uniforms.","The council met on Monday.","The rule appears on page 5."],0,"'Think' expresses an opinion."],
+["In a poll of 150 students, 90 supported a light make-up allowance.",PC,["50%","90%","60%","66%"],2,"90 ÷ 150 = 0.60 = 60%."],
+["Make-up can boost confidence. _____ it can distract students if it is excessive.","Choose the best contrastive connective:","Therefore,|For example,|Similarly,|However,".split('|'),3,"'However' introduces a contrast."],
+["The vice principal said, \"The rule is too strict.\"",RS,["The vice principal said that the rule is too strict.","The vice principal said that the rule was too strict.","The vice principal told that the rule was too strict.","The vice principal said the rule being too strict."],1,"Backshift: is → was."],
+[null,OP,["The survey had 150 respondents.","The handbook has a make-up rule.","Make-up ruins the school's image.","Ninety students supported the change."],2,"'Ruins' is a personal judgement."],
+["A teacher argues that make-up will take students' attention away from lessons.",RB,["Teachers always exaggerate.","Students never look at each other.","Lessons are not important.","The concern is valid; however, limiting make-up to natural looks keeps attention on lessons."],3,"A rebuttal acknowledges the concern and offers a practical answer."]]);
+X('electricity',[["Classrooms should switch off lights and fans when empty. A simple habit saves money and protects the environment.",TH,["A simple habit saves money.","Fans are used in schools.","Classrooms should switch off lights and fans when empty.","Environments are important."],2,"The thesis states the main recommendation."],
+[null,MV,["The caretaker locked the gate.","Many teachers believe that small habits matter.","The bill came last week.","Lights hang from the ceiling."],1,"'Believe' expresses an opinion."],
+["Electricity use fell from 400 kWh to 300 kWh after the new rules.","What is the percentage decrease?",["10%","20%","25%","33%"],2,"100 ÷ 400 = 0.25 = 25%."],
+["The lights were left on overnight. _____ the bill rose sharply.",CN,["In contrast,","For example,","Likewise,","As a result,"],3,"The higher bill is the result."],
+["The caretaker said, \"I turn off the lights every evening.\"",RS,["The caretaker said that he turned off the lights every evening.","The caretaker said that he turns off the lights every evening.","The caretaker told that he turned off the lights every evening.","The caretaker said he turning off the lights every evening."],0,"Backshift: turn → turned."],
+[null,FT,["Air conditioners are a waste of money.","Students are lazy about switching off lights.","Saving power is boring.","The school bill rose by 30%."],3,"It is a verifiable statement."],
+["A student argues that fans must stay on because classrooms get hot.",RB,["Heat is not real.","The concern is fair; however, fans can be switched off when rooms are empty or windows are opened.","Fans should be broken.","Students should sit outside."],1,"A rebuttal acknowledges the concern and offers a solution."]]);
+X('mbg',[["The free meal programme should continue, but menus must be improved. Students deserve food that is both safe and tasty.",TH,["Students deserve tasty food.","The free meal programme should continue, but menus must be improved.","Menus are written weekly.","Food is safe."],1,"The thesis states the writer's position."],
+[null,MV,["The kitchen delivered rice.","The queue formed at noon.","Trays were stacked.","Some students feel that the portions are too small."],3,"'Feel' expresses an opinion."],
+["Out of 300 students, 225 finished their meals.",PC,["25%","60%","75%","225%"],2,"225 ÷ 300 = 0.75 = 75%."],
+["The meal is free. _____ some students still bring snacks from home.","Choose the best contrastive connective:",["Moreover,","Therefore,","For example,","However,"],3,"'However' contrasts the two ideas."],
+["The cook said, \"We prepare the food at dawn.\"",RS,["The cook said that we prepared the food at dawn.","The cook said that they prepare the food at dawn.","The cook said that they prepared the food at dawn.","The cook told that they prepared the food at dawn."],2,"Backshift: prepare → prepared; we → they."],
+[null,OP,["The chicken is far too dry.","Each tray has four compartments.","The meal costs students nothing.","Meals arrive at 10 a.m."],0,"'Far too dry' is a personal judgement."],
+["A parent argues that the meals are not tasty.",RB,["Taste does not exist.","The concern is understandable; however, students can give menu feedback so the kitchen can improve the taste.","Parents should cook at school.","Children must eat anything."],1,"A rebuttal acknowledges the concern and offers a solution."]]);
+X('trash',[["Schools should provide separate bins for organic and plastic waste. Sorting makes recycling possible and teaches responsibility.",TH,["Recycling is possible.","Responsibility is a value.","Plastic is light.","Schools should provide separate bins for organic and plastic waste."],3,"The thesis states the main recommendation."],
+[null,MV,["The cleaners emptied the bins.","Students dropped wrappers.","Many students realise that litter harms the school.","The bins are green."],2,"'Realise' is a mental verb."],
+["Of 80 bags collected, 20 were recyclable.","What percentage of the bags were recyclable?",["20%","25%","40%","80%"],1,"20 ÷ 80 = 0.25 = 25%."],
+["Students sort their trash. _____ the recycling centre accepts it.","Choose the connective that shows result:",["However,","On the other hand,","For instance,","As a result,"],3,"Acceptance is the result of sorting."],
+["The cleaner said, \"The bins are full.\"",RS,["The cleaner said that the bins are full.","The cleaner said the bins being full.","The cleaner said that the bins were full.","The cleaner told that the bins were full."],2,"Backshift: are → were."],
+[null,FT,["Sorting is a pointless chore.","Students are too lazy to recycle.","The canteen is the dirtiest place.","Twenty of the eighty bags were recyclable."],3,"It is a verifiable statement."],
+["A student argues that sorting takes too much time.",RB,["Time does not matter.","Sorting is never needed.","The concern is valid; however, clearly labelled bins make sorting take only a few seconds.","Students should stay silent."],2,"A rebuttal acknowledges the concern and offers a solution."]]);
+X('phone',[["Phones should be allowed only during learning activities. Used well, they support research; used freely, they distract.",TH,["Used freely, they distract.","Phones should be allowed only during learning activities.","Phones support research.","Students own phones."],1,"The thesis states the main recommendation."],
+[null,MV,["Students put phones in lockers.","The teacher collected the phones.","The bell rang.","Some teachers worry that phones reduce attention."],3,"'Worry' expresses a mental state."],
+["In a class of 40, 10 students used phones for research.",PC,["10%","25%","40%","50%"],1,"10 ÷ 40 = 0.25 = 25%."],
+["Phones can distract students. _____ they can also help them study.","Choose the best contrastive connective:",["However,","Therefore,","For example,","Similarly,"],0,"'However' contrasts the two ideas."],
+["The principal said, \"Students must keep phones in bags.\"",RS,["The principal said students must keeping phones in bags.","The principal said that students must keep phones in bags.","The principal told that students had to keep phones in bags.","The principal said that students must kept phones in bags."],1,"The modal 'must' stays the same, followed by the base form."],
+[null,OP,["Phones are a total waste of time.","Thirty-six students were surveyed.","The school has lockers.","Ten students use phones for research."],0,"'A total waste of time' is a personal judgement."],
+["A student argues that restrictions show teachers do not trust students.",RB,["Trust is unimportant.","Teachers never trust anyone.","The concern is understandable; however, clear rules protect learning time and can be agreed together.","Students should make no rules."],2,"A rebuttal acknowledges the concern and offers a solution."]]);
+const QN=[3,3,3,3,3,3,3,2,2],ST=[0,3,6,9,12,15,18,21,23];
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const INK='#2b2a4c';
+const lsGet=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+
+/* ---------- Cartoon characters (flat style, feet at 0,0) ---------- */
+function kid(o){
+  const s=o.skin,h=o.hair,t=o.shirt,p=o.pants||'#4a5fa8',st=o.style||'short';
+  let back='',after='',head=`<circle cy="-52" r="17" fill="${s}"/>`,front=`<path d="M-18-52a18 18 0 0 1 36 0q-10-9-18-7q-8-2-18 7z" fill="${h}"/>`;
+  if(st==='bob')back=`<rect x="-20" y="-70" width="40" height="40" rx="16" fill="${h}"/>`;
+  if(st==='pony')back=`<circle cx="22" cy="-44" r="8" fill="${h}"/>`;
+  if(st==='buns')back=`<circle cx="-17" cy="-68" r="9" fill="${h}"/><circle cx="17" cy="-68" r="9" fill="${h}"/>`;
+  if(st==='peci')front+=`<rect x="-14" y="-75" width="28" height="12" rx="3" fill="#25232f"/>`;
+  if(st==='hijab'){after=`<path d="M-22-50a22 24 0 0 1 44 0v6q0 18 14 32h-72q14-14 14-32z" fill="${h}"/>`;head=`<ellipse cy="-50" rx="14" ry="15" fill="${s}"/>`;front=`<path d="M-15-56q15-14 30 0q-15-5-30 0z" fill="${h}"/>`;}
+  const gl=o.glasses?`<g fill="none" stroke="${INK}" stroke-width="2"><circle cx="-7" cy="-52" r="6"/><circle cx="7" cy="-52" r="6"/><path d="M-1-52h2"/></g>`:'';
+  return `<g class="kid"><ellipse cy="1" rx="19" ry="5" fill="rgba(0,0,0,.18)"/>
+  <rect x="-10" y="-17" width="8" height="17" rx="3" fill="${p}"/><rect x="2" y="-17" width="8" height="17" rx="3" fill="${p}"/>
+  <rect x="-11" y="-4" width="10" height="4" rx="2" fill="#3a2f2f"/><rect x="1" y="-4" width="10" height="4" rx="2" fill="#3a2f2f"/>
+  <circle cx="-17" cy="-26" r="5" fill="${s}"/><circle cx="17" cy="-26" r="5" fill="${s}"/>
+  <rect x="-14" y="-41" width="28" height="27" rx="10" fill="${t}"/>${back}${after}${head}
+  <circle cx="-6.5" cy="-52" r="4.2" fill="#fff"/><circle cx="6.5" cy="-52" r="4.2" fill="#fff"/><circle cx="-6" cy="-52" r="2.4" fill="${INK}"/><circle cx="7" cy="-52" r="2.4" fill="${INK}"/>
+  <circle cx="-11" cy="-45" r="3" fill="#ff8f8f" opacity=".55"/><circle cx="11" cy="-45" r="3" fill="#ff8f8f" opacity=".55"/>
+  <path d="M-4-44q4 4 8 0" stroke="#7a3b2e" stroke-width="2" fill="none" stroke-linecap="round"/>${front}${gl}</g>`;
+}
+const AV=[
+ {skin:'#f6c9a0',hair:'#2a2323',shirt:'#ef6a4c',style:'bob'},
+ {skin:'#e9a97c',hair:'#2a2323',shirt:'#f3c34b',style:'short'},
+ {skin:'#8a5a3b',hair:'#1b1717',shirt:'#f08fb0',style:'buns'},
+ {skin:'#f6c9a0',hair:'#e8b24a',shirt:'#7fb7e6',style:'pony'},
+ {skin:'#e9a97c',hair:'#d9534f',shirt:'#8ccf9a',style:'hijab',pants:'#6b6f9c'},
+ {skin:'#c98a5b',hair:'#2a2323',shirt:'#6d7bd8',style:'short',pants:'#2f3e6b'},
+ {skin:'#ffdcb8',hair:'#7a4a2a',shirt:'#ff9f43',style:'pony'},
+ {skin:'#8a5a3b',hair:'#1b1717',shirt:'#4cc2a5',style:'peci'}
+];
+const avSvg=(a,vb='-26 -88 52 92')=>`<svg viewBox="${vb}">${kid(AV[a%AV.length])}</svg>`;
+
+/* ---------- School map data ---------- */
+const COLS=[170,500,830],ROWS=[145,380,615];
+const BLD=[
+ {id:'office',name:"Principal's Office",ic:'🏛️',tip:'A strong text starts with a clear THESIS: the writer\'s position on the issue.',npc:{n:'Mr. Budi',skin:'#e9a97c',hair:'#2a2323',shirt:'#2f4e9a',style:'peci',glasses:1},c:['#ffe29a','#f4a63a']},
+ {id:'teachers',name:"Teachers' Room",ic:'🍎',tip:'Look for language features: mental verbs (believe, think), evaluative words and connectives.',npc:{n:'Ms. Sari',skin:'#f6c9a0',hair:'#c0508a',shirt:'#c0508a',style:'hijab'},c:['#ffc3d5','#ee6f9b']},
+ {id:'class',name:'Classroom',ic:'✏️',tip:'Build the text step by step: Thesis → Arguments → Reiteration.',npc:{n:'Dewi',skin:'#c98a5b',hair:'#1b1717',shirt:'#3d8bff',style:'bob'},c:['#b9dcff','#4f95e8']},
+ {id:'council',name:'Student Council',ic:'📣',tip:'Each argument needs a point and an elaboration. Use clear connectives!',npc:{n:'Rafi',skin:'#e9a97c',hair:'#2a2323',shirt:'#4cc26b',style:'short'},c:['#c6f0c2','#4cb35f']},
+ {id:'library',name:'Library',ic:'📚',tip:'Good evidence = facts, statistics, expert opinions. Check what is verifiable.',npc:{n:'Mrs. Rina',skin:'#f6c9a0',hair:'#5b3a29',shirt:'#9a74e0',style:'buns',glasses:1},c:['#e4d2ff','#9a74e0']},
+ {id:'canteen',name:'Canteen',ic:'🍜',tip:'Anticipate counter-arguments and rebut them politely: "I understand… however…"',npc:{n:'Bu Tini',skin:'#e9a97c',hair:'#8a5a3b',shirt:'#ee8140',style:'hijab'},c:['#ffd3a8','#ee8140']},
+ {id:'news',name:'Journalism Room',ic:'📰',tip:'Separate FACT from OPINION and report what people say accurately.',npc:{n:'Alex',skin:'#ffdcb8',hair:'#e8b24a',shirt:'#3cb5a8',style:'pony'},c:['#bff0ea','#3cb5a8']},
+ {id:'board',name:'Bulletin Board',ic:'📌',tip:'End with a REITERATION: restate your thesis and sum up the key arguments.',npc:{n:'Nadia',skin:'#f6c9a0',hair:'#2a2323',shirt:'#e8605a',style:'bob'},c:['#ffd0cc','#e8605a']},
+ {id:'hall',name:'Forum Hall',ic:'🎤',tip:'Final forum! Combine everything you learned to persuade the audience.',npc:{n:'Pak Hendra',skin:'#c98a5b',hair:'#2a2323',shirt:'#d9b52e',style:'peci',glasses:1},c:['#fff0a8','#d9b52e']}
+];
+BLD.forEach((b,i)=>{b.cx=COLS[i%3];b.bot=ROWS[Math.floor(i/3)];b.nx=b.cx+78;b.ny=b.bot+42;b.blk={x:b.cx-118,y:b.bot-125,w:236,h:118};});
+
+
+const SCHOOLS=[
+ {name:'SMA Harapan 1',short:'SMA 1',theme:'makeup',off:0,color:'#ef6a4c',grass:'#8fd36b',situation:'The Student Council wants to allow light, natural make-up at school. The principal fears it will hurt discipline, and the class is split.'},
+ {name:'SMA Harapan 2',short:'SMA 2',theme:'electricity',off:0,color:'#3d8bff',grass:'#93d57a',situation:'The electricity bill rose by 30% last semester. Air conditioners and lights stay on in empty classrooms. Should the school adopt strict energy-saving rules?'},
+ {name:'SMA Harapan 3',short:'SMA 3',theme:'mbg',off:0,color:'#9a74e0',grass:'#86cf7c',situation:'Your school has just started receiving free meals. Some students and parents are excited, others worry about food safety and quality. Should students support the program as it is?'},
+ {name:'SMK Harapan 1',short:'SMK 1',theme:'trash',off:0,color:'#f2a31f',grass:'#9bd86e',situation:'School bins overflow every day. The principal is testing a rule that students must take their own trash home. Is this rule an efficient way to reduce school waste?'},
+ {name:'SMK Harapan 2',short:'SMK 2',theme:'phone',off:0,color:'#2fb5a0',grass:'#8ad37f',situation:'Phones keep buzzing during lessons. The school is considering limiting smartphone use in class, while students say they need phones for learning and emergencies.'}
+];
+const ROLES=[
+ {id:'principal',title:'Principal',ic:'🎩',desc:'Holds the final say. Priority: a stable and safe policy.',ability:'Final Decision',clues:['The school budget is very tight and the education office has sent a reminder.','The numbers in the first survey report do not match the documents from the office.','The decision must protect classroom stability and extracurricular activities.']},
+ {id:'teacher',title:'Homeroom Teacher',ic:'🍎',desc:'Supports students without causing conflict in the class.',ability:'Consultation & Feedback',clues:['Some students feel insecure if the rule is applied too strictly.','Real classroom conditions need guidelines that are clear yet flexible.','Parents\' support is essential for the rule to be followed.']},
+ {id:'council',title:'Student Council President',ic:'📣',desc:'Proposes the thesis, voices student opinions and runs internal votes.',ability:'Thesis & Voting',clues:['Internal survey: 60% of students want clear and fair limits.','Many students complain about confusing sanctions because the rule is not specific.','The inter-school forum is the place to voice shared aspirations.']},
+ {id:'journalist',title:'School Journalist',ic:'🕵️',desc:'Verifies facts, interviews sources and presents factual evidence.',ability:'Fact-Check & Interview',clues:['An anonymous source says the survey or bill data differ from what was reported.','An expert (dermatologist or technician) gives a valid scientific explanation.','An investigative report is ready to publish for the district forum.']},
+ {id:'editor',title:'Bulletin Editor',ic:'📌',desc:'Publishes sharp, short headlines and summaries that are easy to read.',ability:'Headline & Summary',clues:['A rumour says the new rule will start next week.','Statements from teachers and the committee must be summarised accurately.','The bulletin headline carries a short conclusion of all the arguments.']},
+ {id:'captain',title:'Class Captain',ic:'✏️',desc:'Puts the arguments together and checks the text structure and connectives.',ability:'Text Assembly & Structure Check',clues:['The class needs certainty so lessons are not disturbed.','The team\'s arguments must be ordered from Thesis to Reiteration.','The team\'s analytical exposition draft is ready for the school meeting.']},
+ {id:'opinion',title:'Opinionated Student',ic:'💬',desc:'Raises sharp counter-arguments that the team must answer rationally.',ability:'Counter-Argument',clues:['A student says an over-strict rule is hurting daily life at school.','A neighbouring school applied a flexible rule with no problems.','A direct rebuttal against points that limit students too much.']},
+ {id:'parent',title:'Committee Representative',ic:'👨‍👩‍👧',desc:'Judges the policy from the view of cost and family spending.',ability:'Budget Approval',clues:['Parents object if the policy causes unexpected costs.','The policy must be optional and budget-friendly.','The committee agrees if there are affordable, written limits.']}
+];
+const THEME_NAME={makeup:'Make-up Policy',electricity:'Saving Electricity',mbg:'Free School Meals (MBG)',trash:'Take-Home Trash Rule',phone:'Smartphones in Class'};
+let SCH=SCHOOLS[0];
+
+function mapSVG(){
+  let s=`<rect width="1000" height="700" fill="${SCH.grass}"/>`;
+  for(let i=0;i<46;i++){const x=(i*173)%1000,y=(i*97)%700;s+=`<ellipse cx="${x}" cy="${y}" rx="${14+i%4*6}" ry="${6+i%3*3}" fill="#83c95f" opacity=".7"/>`}
+  const path='#f0d9a4',edge='#e2c488';
+  [[0,148,1000,106],[0,383,1000,106],[0,618,1000,82]].forEach(r=>s+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="${path}"/><rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="5" fill="${edge}"/>`);
+  [[285,0,100,700],[615,0,100,700]].forEach(r=>s+=`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="${path}"/>`);
+  for(let i=0;i<30;i++){const x=(i*211+40)%960+20,y=(i*131+30)%680+10;if(!BLD.some(b=>x>b.blk.x-8&&x<b.blk.x+b.blk.w+8&&y>b.blk.y-10&&y<b.blk.y+b.blk.h+8)&&!(x>280&&x<390)&&!(x>610&&x<720)&&!(y>140&&y<258)&&!(y>378&&y<492)&&!(y>612))s+=`<g transform="translate(${x},${y})"><circle r="3" fill="#fff"/><circle r="1.4" fill="#ffc83d"/></g>`}
+  [[24,40],[24,300],[24,560],[976,40],[976,300],[976,560],[335,110],[665,350],[335,590]].forEach(([x,y])=>s+=`<g transform="translate(${x},${y})"><rect x="-5" y="-4" width="10" height="26" rx="3" fill="#8a5a3b"/><circle cy="-14" r="24" fill="#3fa65a" stroke="${INK}" stroke-width="3"/><circle cx="-8" cy="-20" r="7" fill="#5cc477" opacity=".7"/></g>`);
+  BLD.forEach(b=>{const t=b.bot-125,x=b.cx;
+    s+=`<g><rect x="${x-110}" y="${t+25}" width="220" height="100" rx="14" fill="${b.c[0]}" stroke="${INK}" stroke-width="4"/>
+    <rect x="${x-120}" y="${t}" width="240" height="38" rx="14" fill="${b.c[1]}" stroke="${INK}" stroke-width="4"/>
+    <text x="${x}" y="${t+26}" text-anchor="middle" font-size="19" font-weight="700" fill="#fff" stroke="${INK}" stroke-width="4" paint-order="stroke" font-family="Fredoka,sans-serif">${b.ic} ${b.name}</text>
+    ${[-86,46].map(d=>`<g><rect x="${x+d}" y="${t+56}" width="40" height="34" rx="6" fill="#d8f3ff" stroke="${INK}" stroke-width="3"/><path d="M${x+d+20} ${t+56}v34M${x+d} ${t+73}h40" stroke="${INK}" stroke-width="2"/></g>`).join('')}
+    <rect x="${x-20}" y="${b.bot-52}" width="40" height="52" rx="9" fill="#a86a3c" stroke="${INK}" stroke-width="3"/><circle cx="${x+10}" cy="${b.bot-26}" r="3" fill="#ffd54a"/>
+    <g id="ok-${b.id}" opacity="0"><circle cx="${x+112}" cy="${t+8}" r="17" fill="#4cc26b" stroke="#fff" stroke-width="4"/><path d="M${x+104} ${t+8}l6 6 11-12" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>`;});
+  return s;
+}
+
+/* ---------- Game state ---------- */
+let me=null,selAv=0,t0=0,done={},xp=0,gems=0,streak=0,correct=0,asked=0;
+/* ---------- Anti-cheat save: progress & locked questions survive refresh ---------- */
+let en=CONFIG.energyMax,mo=0,ru={},rcur=null,repT=null,pressT=null,stealCd=0,stealWait=null,msgT=null;const rp=n=>'Rp'+n.toLocaleString('id-ID');
+const SAVE='hh_save_v1';let sv={res:{},cur:null},lockedMsg=false;
+const saveGet=()=>{try{return JSON.parse(localStorage.getItem(SAVE)||'null')}catch(e){return null}};
+function persist(){if(!me)return;try{localStorage.setItem(SAVE,JSON.stringify({id:me.id,name:me.name,room:me.room,av:me.av,sch:me.sch,rl:me.rl,done,xp,gems,streak,correct,asked,res:sv.res,cur:sv.cur,en,mo,ru,rcur}))}catch(e){}}
+const ents={},keys={};let bots=[],lastSend=0,cam={x:0,y:0};
+const poolFor=sc=>{const q=QB[sc.theme],p=Object.values(q).flat(),o=sc.off%p.length;return sc.qs||p.slice(o).concat(p.slice(0,o))};
+const VERBS='go,went,gone;eat,ate,eaten;write,wrote,written;take,took,taken;see,saw,seen;give,gave,given;know,knew,known;come,came,come;run,ran,run;begin,began,begun;drink,drank,drunk;speak,spoke,spoken;break,broke,broken;choose,chose,chosen;drive,drove,driven;fly,flew,flown;forget,forgot,forgotten;buy,bought,bought;bring,brought,brought;teach,taught,taught;think,thought,thought;catch,caught,caught;build,built,built;send,sent,sent;spend,spent,spent;sell,sold,sold;tell,told,told;make,made,made;find,found,found;keep,kept,kept;leave,left,left;lose,lost,lost;meet,met,met;pay,paid,paid;sit,sat,sat;stand,stood,stood;win,won,won;wear,wore,worn;swim,swam,swum;sing,sang,sung;grow,grew,grown;draw,drew,drawn;throw,threw,thrown;steal,stole,stolen;fall,fell,fallen;hide,hid,hidden;ride,rode,ridden;sleep,slept,slept;feel,felt,felt;hear,heard,heard;study,studied,studied;stop,stopped,stopped;carry,carried,carried;plan,planned,planned'.split(';').map(x=>x.split(','));
+const REP=[];VERBS.forEach((v,k)=>{[[1,0,'What is the V2 (past form) of “'+v[0]+'”?'],[2,1,'Change V2 to V3 (past participle): “'+v[1]+'” → ?'],[2,0,'What is the V3 (past participle) of “'+v[0]+'”?']].forEach(([sl,fr,q],t)=>{
+  const a=v[sl],o=[];[v[0],v[1],v[2],v[0].endsWith('e')?v[0]+'d':v[0]+'ed'].forEach(x=>{if(x!==a&&!o.includes(x))o.push(x)});
+  for(let j=1;o.length<3;j++){const x=VERBS[(k+j*7)%VERBS.length][sl];if(x!==a&&!o.includes(x))o.push(x)}
+  REP.push({id:k+'-'+t,q,options:[a,...o.slice(0,3)],answer:0,fb:v.join(' – ')+' (V1 – V2 – V3)'})})});
+function toast(t){const m=$('#msg');m.textContent=t;m.classList.remove('hide');clearTimeout(msgT);msgT=setTimeout(()=>m.classList.add('hide'),4500)}
+function stealTo(id){if(!id||Date.now()<stealCd)return;stealCd=Date.now()+CONFIG.stealCooldown*1000;stealWait={to:id};Net.ev(id,{t:'steal',amt:CONFIG.stealAmt});toast('🦹 Sneaking up…');setTimeout(()=>{if(stealWait&&stealWait.to===id){stealWait=null;toast('Nothing happened…')}},7000)}
+function onEv(e){const who=(Net.peers[e.from]||{}).name||'Someone';
+  if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;ok=true;toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
+  else if(e.t==='res'&&stealWait&&stealWait.to===e.from){stealWait=null;if(e.ok){mo+=e.amt;toast(`🦹 You stole ${rp(e.amt)} from ${who}!`)}else{const l=Math.min(e.amt,mo);mo-=l;toast(`😬 ${who} had no money! You lost ${rp(l)}.`)}hud();persist()}}
+const FOOD=[{n:'Es Teh',ic:'🧋',p:3000,e:10},{n:'Cimol Bojot',ic:'🍢',p:5000,e:25},{n:'Bakso',ic:'🍜',p:8000,e:45},{n:'Nasi Uduk Komplit',ic:'🍛',p:12000,e:80}];
+const hidePress=()=>{clearTimeout(pressT);$('#press').classList.add('hide')};
+function schedRep(first){clearTimeout(repT);const[a,b]=CONFIG.reporterEvery;repT=setTimeout(()=>{if(REP.some(q=>!ru[q.id])){$('#press').classList.remove('hide');clearTimeout(pressT);pressT=setTimeout(hidePress,120000)}schedRep(false)},first?60000:(a+Math.random()*(b-a))*60000)}
+function reporterAsk(){
+  hidePress();const f=REP.filter(q=>!ru[q.id]);if(!f.length)return;const q=f[Math.floor(Math.random()*f.length)],nb=BLD.find(b=>b.id==='news'),opts=shuffle(q.options.map((t,i)=>({t,ok:i===q.answer})));
+  rcur=q.id;persist();
+  open(`<div class="who">${npcPortrait(nb)}<div class="bubble"><b class="nm">📰 ${nb.npc.n} · School Reporter</b>Excuse me, ${me.name}! A quick interview for the school paper. Answer right and earn <b>${rp(CONFIG.reward)}</b>! (No energy lost if you miss.)</div></div><div class="q">${q.q}</div><div id="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><i>${'ABCD'[i]}</i><span>${o.t}</span></button>`).join('')}</div><div id="fbx"></div>`);
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.i];document.querySelectorAll('.opt').forEach(x=>x.disabled=true);ru[q.id]=1;rcur=null;
+    if(o.ok){b.classList.add('ok');mo+=CONFIG.reward;xp+=5}else b.classList.add('no');hud();persist();
+    $('#fbx').innerHTML=`<div class="fb pop">${o.ok?'✅ Correct! 💰 +'+rp(CONFIG.reward)+'. '+q.fb:'❌ Not quite. No reward, and this question is now locked.'}</div><div style="margin-top:12px"><button class="btn y" id="ok">Close</button></div>`;$('#ok').onclick=close})}
+function tired(){open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n}</b>You look exhausted, ${me.name}! 😵 Answer the reporter's questions to earn money, then buy food at the Canteen 🍜 to refill your energy.</div></div><div class="row" style="margin-top:14px"><button class="btn" id="ok">OK</button></div>`);$('#ok').onclick=close}
+function shop(msg){
+  open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n} · Food Stall</b>${msg||'Hungry? Eat up to get your energy back!'}<br>🔋 ${en}/${CONFIG.energyMax} · 💰 ${rp(mo)}</div></div>`+FOOD.map((f,i)=>`<button class="opt" data-f="${i}"><i>${f.ic}</i><span>${f.n} · +${f.e} 🔋</span><b style="margin-left:auto">${rp(f.p)}</b></button>`).join('')+`<div class="row" style="margin-top:12px"><button class="btn gr" id="later">Close</button></div>`);
+  $('#later').onclick=close;document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=FOOD[+b.dataset.f];
+    if(en>=CONFIG.energyMax)return shop('Your energy is already full! 💪');if(mo<f.p)return shop('Not enough money 😅 Answer the reporter\'s questions to earn more!');
+    mo-=f.p;en=Math.min(CONFIG.energyMax,en+f.e);hud();persist();shop(`Yum! ${f.ic} ${f.n}: +${f.e} 🔋`)})}
+const clueNow=()=>{const n=Object.keys(done).length;return ROLES[me.rl].clues[n<3?0:n<6?1:2]};
+
+/* ---------- Networking: local tabs or Firebase REST ---------- */
+const Net={peers:{},mode:'local',ok:true,seen:{},
+ start(room,m){this.room=room;this.me=m;const fb=cfgFb();
+  if(fb){this.mode='cloud';this.url=fb;setInterval(()=>this.poll(),1000);
+    addEventListener('beforeunload',()=>{fetch(`${fb}/hh/${room}/${m.id}.json`,{method:'DELETE',keepalive:true}).catch(()=>{})});}
+  else{try{this.ch=new BroadcastChannel('hh-'+room);this.ch.onmessage=e=>this.got(e.data)}catch(e){}}},
+ got(s){if(s&&s.ev){if(s.ev.to===this.me.id)onEv(s.ev);return}if(!s||!s.id||s.id===this.me.id)return;let p=this.peers[s.id];if(!p){p=this.peers[s.id]={dx:s.x,dy:s.y};p.seen=Date.now();}
+  if(p.ts!==s.ts)p.seen=Date.now();Object.assign(p,s);},
+ send(s){this.last=s;if(this.mode==='local'&&this.ch)this.ch.postMessage(s);},
+ ev(to,o){const m={...o,to,from:this.me.id};if(this.mode==='local'){if(this.ch)this.ch.postMessage({ev:m})}else fetch(`${this.url}/hh_ev/${this.room}/${to}/${Date.now().toString(36)+Math.random().toString(36).slice(2,6)}.json`,{method:'PUT',body:JSON.stringify(m)}).catch(()=>{})},
+ async poll(){try{const b=`${this.url}/hh/${this.room}`;if(this.last)await fetch(`${b}/${this.me.id}.json`,{method:'PUT',body:JSON.stringify(this.last)});
+  const d=await(await fetch(b+'.json')).json();this.ok=true;if(d)for(const k in d)this.got(d[k]);const ev=await(await fetch(`${this.url}/hh_ev/${this.room}/${this.me.id}.json`)).json();if(ev)for(const k in ev){if(this.seen[k])continue;this.seen[k]=1;onEv(ev[k]);fetch(`${this.url}/hh_ev/${this.room}/${this.me.id}/${k}.json`,{method:'DELETE'}).catch(()=>{})}}catch(e){this.ok=false}},
+ prune(){const n=Date.now();for(const k in this.peers)if(n-this.peers[k].seen>6000){delete this.peers[k];removeEnt(k)}}
+};
+
+/* ---------- Entities ---------- */
+function addEnt(id,o,name,tag){
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.innerHTML=`<g class="body">${kid(o)}</g><text y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" stroke="${INK}" stroke-width="3.5" paint-order="stroke" font-family="Fredoka,sans-serif" class="nm"></text><text y="-92" text-anchor="middle" font-size="26" class="em"></text>${tag||''}`;
+  g.querySelector('.nm').textContent=name;$('#ents').appendChild(g);ents[id]={g,body:g.querySelector('.body'),em:g.querySelector('.em'),face:1,ph:Math.random()*6};return ents[id];
+}
+function removeEnt(id){if(ents[id]){ents[id].g.remove();delete ents[id]}}
+const MARK=`<g class="mk npcm"><circle cy="-98" r="13" fill="#ffc83d" stroke="${INK}" stroke-width="3"/><text y="-92" text-anchor="middle" font-size="18" font-weight="700" fill="${INK}" font-family="Fredoka,sans-serif">!</text></g>`;
+function showEmote(id,e){const en=ents[id];if(!en)return;en.em.textContent=e;clearTimeout(en.et);en.et=setTimeout(()=>en.em.textContent='',2800)}
+function place(id,x,y,moving,t,face){const en=ents[id];if(!en)return;
+  if(face)en.face=face;const bob=moving?Math.abs(Math.sin(t/90+en.ph))*-5:0;
+  en.g.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`);en.g.dataset.y=y;
+  en.body.setAttribute('transform',`translate(0,${bob}) scale(${en.face},1)`);}
+
+/* ---------- Movement ---------- */
+const blocked=(x,y)=>BLD.some(b=>x>b.blk.x&&x<b.blk.x+b.blk.w&&y>b.blk.y&&y<b.blk.y+b.blk.h+12);
+function tryMove(o,dx,dy){const nx=clamp(o.x+dx,20,980),ny=clamp(o.y+dy,48,692);let m=false;if(!blocked(nx,o.y)){if(nx!==o.x)m=true;o.x=nx}if(!blocked(o.x,ny)){if(ny!==o.y)m=true;o.y=ny}return m}
+function nearNPC(){let best=null,bd=95;BLD.forEach(b=>{const d=Math.hypot(me.x-b.nx,me.y-b.ny);if(d<bd){bd=d;best=b}});return best}
+
+let prev=0,moving=false;
+function frame(t){
+  const dt=Math.min(.05,(t-prev)/1000||0);prev=t;
+  let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);
+  moving=false;const sp=230*dt;
+  if(dx||dy){me.tx=null;const l=Math.hypot(dx,dy);moving=tryMove(me,dx/l*sp,dy/l*sp);if(dx)me.f=dx>0?1:-1}
+  else if(me.tx!=null){const vx=me.tx-me.x,vy=me.ty-me.y,d=Math.hypot(vx,vy);if(d<6)me.tx=null;else{moving=tryMove(me,vx/d*sp,vy/d*sp);me.f=vx>0?1:-1;if(!moving)me.tx=null}}
+  place('me',me.x,me.y,moving,t,me.f);
+  // peers
+  Net.prune();const real=Object.values(Net.peers);{const sb=$('#stealbtn');let np=null,nd=90;real.forEach(p=>{const d=Math.hypot(me.x-p.x,me.y-p.y);if(d<nd){nd=d;np=p}});if(np&&$('#modal').classList.contains('hide')&&Date.now()>stealCd){sb.classList.remove('hide');sb.textContent='🦹 Steal from '+np.name;sb.dataset.id=np.id}else sb.classList.add('hide')}
+  real.forEach(p=>{if(!ents[p.id])addEnt(p.id,AV[p.av%AV.length],p.name);const ox=p.dx;p.dx+=(p.x-p.dx)*.2;p.dy+=(p.y-p.dy)*.2;
+    if(p.emt&&p.emt!==p._emt){p._emt=p.emt;showEmote(p.id,p.emo)}
+    place(p.id,p.dx,p.dy,Math.abs(p.x-p.dx)+Math.abs(p.y-p.dy)>2,t,p.x-ox>.3?1:p.x-ox<-.3?-1:0)});
+  // bots only when alone
+  const showBots=real.length===0;
+  bots.forEach(b=>{const en=ents[b.id];if(en)en.g.style.display=showBots?'':'none';if(!showBots)return;
+    const vx=b.tx-b.x,vy=b.ty-b.y,d=Math.hypot(vx,vy);
+    if(d<5){if(!b.w)b.w=t+1500+Math.random()*2500;if(t>b.w){b.w=0;const nb=b.nodes.filter(n=>(n[1]===b.ty||(n[0]===b.tx&&(b.tx===335||b.tx===665)))&&(n[0]!==b.tx||n[1]!==b.ty));const n=nb[Math.floor(Math.random()*nb.length)];b.tx=n[0];b.ty=n[1];}}
+    else{b.x+=vx/d*110*dt;b.y+=vy/d*110*dt;b.f=vx>0?1:-1}
+    if(t>b.nx){b.nx=t+9000+Math.random()*9000;b.xp+=10}
+    place(b.id,b.x,b.y,d>5,t,b.f)});
+  // depth sort
+  const arr=[...$('#ents').children].sort((a,c)=>(+a.dataset.y||0)-(+c.dataset.y||0));arr.forEach(e=>$('#ents').appendChild(e));
+  // camera
+  const w=$('#world').clientWidth,h=$('#world').clientHeight,asp=w/h;let vw=700*asp,vh=700;if(asp<1){vw=500;vh=500/asp}else if(vw>1000){vw=1000;vh=1000/asp}
+  const cl=(v,a,b)=>b<a?(a+b)/2:clamp(v,a,b);
+  cam.x+=(cl(me.x-vw/2,0,1000-vw)-cam.x)*.18;cam.y+=(cl(me.y-vh/2,0,700-vh)-cam.y)*.18;
+  $('#world').setAttribute('viewBox',`${cam.x.toFixed(1)} ${cam.y.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+  // prompt
+  const nb=nearNPC();const tb=$('#talkbtn');if(nb&&$('#modal').classList.contains('hide')){tb.classList.remove('hide');tb.textContent=`💬 Talk to ${nb.npc.n}`;tb.dataset.b=nb.id}else tb.classList.add('hide');
+  // network tick
+  if(t-lastSend>250){lastSend=t;Net.send({id:me.id,name:me.name,av:me.av,x:Math.round(me.x),y:Math.round(me.y),xp,done:Object.keys(done).length,sch:me.sch,rl:me.rl,clue:me.share?clueNow():'',emo:me.emo,emt:me.emt,ts:Date.now()+Math.random()})}
+  $('#np').textContent=1+real.length+(showBots?bots.length:0);
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Dialogue & quiz ---------- */
+const open=h=>{$('#talk').innerHTML=h;$('#modal').classList.remove('hide')};
+const close=()=>$('#modal').classList.add('hide');
+const npcPortrait=b=>`<svg viewBox="-26 -88 52 92">${kid(b.npc)}</svg>`;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let cur=null,qs=[],qi=0,right=0;
+function talk(id){
+  cur=BLD.find(b=>b.id===id);if(!cur)return;me.tx=null;
+  const d=done[cur.id];
+  open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n} · ${cur.name}</b>${d?`Great job, ${me.name}! You already finished my mission. Try the other buildings too!`:`Hi ${me.name}! 👋 ${cur.tip}<br><br>🔒 <i>As ${ROLES[me.rl].title}, you know: “${clueNow()}”</i><br><br>Ready for <b>${QN[BLD.indexOf(cur)]} challenges</b>? (Each wrong answer costs ${CONFIG.wrongCost} 🔋)`}</div></div>
+  <div class="row" style="margin-top:14px">${d?'':'<button class="btn y" id="lets">Let\'s go!</button>'}<button class="btn gr" id="later">${d?'Close':'Later'}</button>${id==='canteen'?'<button class="btn b" id="shop">🛒 Food</button>':''}</div>`);
+  $('#later').onclick=close;if(id==='canteen')$('#shop').onclick=()=>shop();if(!d)$('#lets').onclick=startQuiz;
+}
+function startQuiz(){
+  if(en<=0)return tired();
+  const pool=poolFor(SCH),i=BLD.indexOf(cur);qs=pool.slice(ST[i],ST[i]+QN[i]);const r=sv.res[cur.id]||{};right=Object.values(r).filter(v=>v===1).length;qi=qs.findIndex((_,k)=>r[k]===undefined);if(qi<0)qi=0;showQ();
+}
+function showQ(){
+  const q=qs[qi],opts=shuffle(q.options.map((t,i)=>({t,ok:i===q.answer})));sv.cur={b:cur.id,i:qi};persist();
+  const showEx=q.excerpt&&!/\?\s*$/.test(q.excerpt);
+  open(`<div class="steps">${qs.map((_,i)=>`<i class="${i<=qi?'on':''}"></i>`).join('')}</div>
+  <div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n} · Challenge ${qi+1}/${qs.length}</b>${showEx?`<span style="font-style:italic">“${q.excerpt}”</span>`:'Listen carefully…'}</div></div>
+  <div class="q">${q.q}</div><div id="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><i>${'ABCD'[i]}</i><span>${o.t}</span></button>`).join('')}</div><div id="fbx"></div>`);
+  document.querySelectorAll('.opt').forEach(btn=>btn.onclick=()=>{
+    const o=opts[+btn.dataset.i];document.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    asked++;sv.cur=null;(sv.res[cur.id]=sv.res[cur.id]||{})[qi]=o.ok?1:0;
+    if(o.ok){btn.classList.add('ok');right++;correct++;streak++;xp+=10+(streak>=3?5:0);gems++;}else{btn.classList.add('no');streak=0;en=Math.max(0,en-CONFIG.wrongCost)}
+    hud();persist();const last=qi===qs.length-1;
+    $('#fbx').innerHTML=`<div class="fb pop">${o.ok?'✅ Correct! '+(q.fb||''):'❌ Not quite. 🔒 This question is now locked. 🔋 −'+CONFIG.wrongCost+(en<=0?' You are out of energy! 😵':'')}</div><div style="margin-top:12px"><button class="btn y" id="nx">${last?'Finish mission ✔':'Next ➜'}</button></div>`;
+    $('#nx').onclick=()=>last?finishB():(en<=0?tired():(qi++,showQ()));
+  });
+}
+function finishB(){
+  done[cur.id]=1;xp+=right===qs.length?20:5;hud();sv.cur=null;persist();sendScore(Object.keys(done).length===BLD.length?'complete':'progress');$('#ok-'+cur.id).setAttribute('opacity','1');const m=ents['npc-'+cur.id];if(m){const mk=m.g.querySelector('.npcm');if(mk)mk.remove()}
+  const n=Object.keys(done).length;
+  if(n===BLD.length)return finale();
+  open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n}</b>${right===qs.length?'Perfect! 🌟 Bonus XP for you!':'Nice effort! Keep going.'}<br>You got <b>${right}/${qs.length}</b>. Missions: <b>${n}/${BLD.length}</b>.</div></div><div class="row" style="margin-top:14px"><button class="btn" id="ok">Continue</button></div>`);$('#ok').onclick=close;
+}
+function finale(){
+  const acc=asked?Math.round(correct/asked*100):0;
+  open(`<div style="text-align:center"><div style="font-size:56px">🏆</div><h2 style="margin:4px 0">Mission Complete!</h2><p style="font-weight:600;margin:0 0 10px">You finished every mission at ${SCH.name}. Your score has been sent to your teacher.</p>
+  <div class="row"><div class="item" style="justify-content:center">⚡ ${xp} XP</div><div class="item" style="justify-content:center">🎯 ${acc}%</div></div>
+  <div class="row" style="margin-top:10px"><button class="btn b" id="rk">🏆 Ranking</button><button class="btn" id="cl">Keep exploring</button></div></div>`);
+  $('#cl').onclick=close;$('#rk').onclick=()=>{close();panel('rank')};
+}
+async function sendScore(status){const u=cfgGas();if(!u)return;const n=Object.keys(done).length;
+  try{await fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({timestamp:new Date().toISOString(),status,name:me.name,roomCode:me.room,school:SCH.name,role:ROLES[me.rl].title,theme:SCH.theme,missions:n,xp,gems,correct,total:asked,money:mo,energy:en,accuracy:asked?Math.round(correct/asked*100):0,durationSeconds:Math.round((Date.now()-t0)/1000)})})}catch(e){}}
+
+/* ---------- HUD & panels ---------- */
+function hud(){$('#en').textContent=en;$('#mo').textContent=rp(mo);const eb=$('#enbar');eb.style.width=(en/CONFIG.energyMax*100)+'%';eb.classList.toggle('low',en<=CONFIG.energyMax*.3);$('#xp').textContent=xp;$('#gem').textContent=gems;$('#stk').textContent=streak;const n=Object.keys(done).length;$('#pg').textContent=n+'/'+BLD.length;$('#pgbar').style.width=(n/BLD.length*100)+'%'}
+function everyone(){
+  const l=[{id:me.id,name:me.name,av:me.av,xp,d:Object.keys(done).length,sch:me.sch,rl:me.rl,me:1}];
+  const real=Object.values(Net.peers);real.forEach(p=>l.push({id:p.id,name:p.name,av:p.av,xp:p.xp||0,d:p.done||0,sch:p.sch,rl:p.rl,clue:p.clue}));
+  if(!real.length)bots.forEach(b=>l.push({id:b.id,name:b.name+' 🤖',av:b.av,xp:b.xp,d:Math.min(8,Math.floor(b.xp/25))}));
+  return l.sort((a,b)=>b.xp-a.xp);
+}
+let tab='map',rtimer=null;
+function panel(t){
+  tab=t;clearInterval(rtimer);['map','mis','rank'].forEach(k=>$('#n-'+k).classList.toggle('on',k===t));
+  const sh=$('#sheet');if(t==='map'){sh.classList.add('hide');return}
+  sh.classList.remove('hide');
+  const sub=p=>(SCHOOLS[p.sch]?SCHOOLS[p.sch].short+' · ':'')+(ROLES[p.rl]?ROLES[p.rl].title+' · ':'');
+  const draw=()=>{const st=sh.scrollTop;
+    if(t==='mis'){const r=ROLES[me.rl],team=everyone().filter(p=>!p.me&&p.sch===me.sch&&p.clue);
+      sh.innerHTML=`<h2>📋 ${SCH.name}</h2><div class="item" style="align-items:flex-start"><span style="font-size:26px">🏫</span><div><span class="chip" style="background:${SCH.color}">${THEME_NAME[SCH.theme]}</span><small style="font-size:14px;opacity:.9;margin-top:4px">${SCH.situation}</small></div></div>
+      <div class="item me" style="align-items:flex-start"><span style="font-size:26px">${r.ic}</span><div>You are the ${r.title}<small>${r.desc}</small><small>⭐ Ability: ${r.ability}</small><div class="lock">🔒 ${clueNow()}</div><button class="btn y" id="shr" style="margin-top:10px;padding:8px 14px;font-size:14px">${me.share?'✅ Sharing with my school team':'📣 Share my clue with my school team'}</button></div></div>
+      ${team.length?'<h2 style="font-size:17px;margin-top:14px">🤝 Clues from your school team</h2>'+team.map(p=>`<div class="item">${avSvg(p.av)}<div>${p.name} · ${ROLES[p.rl]?ROLES[p.rl].title:''}<small>“${p.clue}”</small></div></div>`).join(''):'<p class="tip">Teammates from your school who share their clue will show up here.</p>'}
+      <h2 style="font-size:17px;margin-top:14px">Buildings</h2>`+BLD.map(b=>`<div class="item ${done[b.id]?'dn':''}"><span style="font-size:26px">${b.ic}</span><div>${b.name}<small>${b.npc.n}</small></div><span class="r">${done[b.id]?'✅':'⭕'}</span></div>`).join('');
+      const sb=$('#shr');if(sb)sb.onclick=()=>{me.share=!me.share;lastSend=0;draw()};}
+    else{const l=everyone(),top=l.slice(0,3),ord=[top[1],top[0],top[2]],hs=[70,100,52],cl=['#9aa5b5','#f2b01e','#cd7f32'],rk=[2,1,3];
+      const tot=SCHOOLS.map((s,i)=>({s,x:l.filter(p=>p.sch===i).reduce((a,p)=>a+p.xp,0),n:l.filter(p=>p.sch===i).length})).filter(o=>o.n).sort((a,b)=>b.x-a.x);
+      sh.innerHTML=`<h2>🏆 Ranking <span class="net" style="font-weight:600;opacity:.7">· ${Net.mode==='cloud'?(Net.ok?'☁️ online':'⚠️ offline'):'📡 local mode'} · ${me.room}</span></h2>
+      ${tot.length?`<div class="chips">${tot.map(o=>`<span class="chip" style="background:${o.s.color}">${o.s.short} · ${o.x} XP</span>`).join('')}</div>`:''}
+      <div class="podium">${ord.map((p,i)=>p?`<div>${avSvg(p.av)}<div>${p.name}</div><div class="blk" style="background:${cl[i]};height:${hs[i]}px">${rk[i]}</div></div>`:'<div></div>').join('')}</div>`+
+      l.map((p,i)=>`<div class="item ${p.me?'me':''}">${avSvg(p.av)}<div>#${i+1} ${p.me?'You':p.name}<small>${sub(p)}${p.d}/9 missions</small></div><span class="r">⚡ ${p.xp} XP</span></div>`).join('');}
+    sh.scrollTop=st;
+  };
+  draw();rtimer=setInterval(draw,t==='rank'?1500:3000);
+}
+
+/* ---------- Start: random school + role, then reveal ---------- */
+const cfgFb=()=>(CONFIG.firebase||lsGet('hh_fb')).trim().replace(/\/$/,'');
+const cfgGas=()=>(CONFIG.gas||lsGet('hh_gas')).trim();
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+async function assign(room){
+  let peers={};const fb=cfgFb();
+  if(fb){try{const c=new AbortController();setTimeout(()=>c.abort(),2500);peers=(await(await fetch(`${fb}/hh/${room}.json`,{signal:c.signal})).json())||{}}catch(e){}}
+  const live=Object.values(peers).filter(p=>p&&p.sch!=null&&Math.abs(Date.now()-p.ts)<20000);
+  // balance: schools with the fewest players first, then roles not yet used in that school
+  const cnt=SCHOOLS.map((_,i)=>live.filter(p=>p.sch===i).length),mn=Math.min(...cnt);
+  const sch=rnd(cnt.map((c,i)=>c===mn?i:-1).filter(i=>i>=0));
+  const used=live.filter(p=>p.sch===sch).map(p=>p.rl),free=ROLES.map((_,i)=>i).filter(i=>!used.includes(i));
+  const rl=rnd(free.length?free:ROLES.map((_,i)=>i));
+  return {sch,rl,av:Math.floor(Math.random()*AV.length)};
+}
+function init(){
+  $('#nm').value=lsGet('hh_name');
+  const avs=$('#avs');AV.forEach((a,i)=>{const b=document.createElement('button');b.innerHTML=avSvg(i);b.onclick=()=>{selAv=i;[...avs.children].forEach((c,j)=>c.classList.toggle('on',j===i))};avs.appendChild(b)});avs.children[0].classList.add('on');
+  const cfg=()=>{const p=prompt('Teacher PIN:');if(p!==String(CONFIG.resetPin))return;$('#fb').value=lsGet('hh_fb');$('#gas').value=lsGet('hh_gas');$('#cfg').classList.remove('hide')};
+  if(!/[?&]guru/.test(location.search)){$('#cfgbtn').classList.add('hide');$('#cfgbtn2').classList.add('hide')}
+  $('#cfgbtn').onclick=cfg;$('#cfgbtn2').onclick=cfg;$('#cfgx').onclick=()=>$('#cfg').classList.add('hide');
+  $('#cfgs').onclick=()=>{lsSet('hh_fb',$('#fb').value);lsSet('hh_gas',$('#gas').value);location.reload()};
+  $('#rst').onclick=()=>{if(confirm('Reset all progress on this device?')){try{localStorage.removeItem(SAVE)}catch(e){}location.reload()}};
+  const sv0=saveGet();if(sv0){$('#nm').value=sv0.name;$('#nm').readOnly=true;$('#rm').value=sv0.room;$('#rm').readOnly=true;$('#go').textContent='▶ Continue';avs.children[0].classList.remove('on');selAv=sv0.av;if(avs.children[sv0.av])avs.children[sv0.av].classList.add('on')}
+  $('#go').onclick=startGame;$('#nm').addEventListener('keydown',e=>e.key==='Enter'&&startGame());
+}
+async function startGame(){
+  const go=$('#go');if(go.disabled)return;
+  const saved=saveGet();const name=saved?saved.name:($('#nm').value.trim()||'Player'+Math.floor(Math.random()*90+10)).slice(0,14),room=saved?saved.room:($('#rm').value.trim()||'CLASS-A').toUpperCase().replace(/[^A-Z0-9_-]/g,'')||'CLASS-A';
+  lsSet('hh_name',name);go.disabled=true;go.textContent='🎲 Shuffling…';
+  const [a]=await Promise.all([saved?Promise.resolve({sch:saved.sch,rl:saved.rl,av:saved.av}):assign(room),new Promise(r=>setTimeout(r,900))]);
+  SCH=SCHOOLS[a.sch];
+  me={id:saved?saved.id:'p'+Math.random().toString(36).slice(2,9),name,room,av:saved?saved.av:selAv,sch:a.sch,rl:a.rl,x:380+Math.random()*50,y:222+Math.random()*20,f:1,tx:null,share:false};
+  const r=ROLES[me.rl];
+  if(saved){done=saved.done||{};xp=saved.xp||0;gems=saved.gems||0;streak=saved.streak||0;correct=saved.correct||0;asked=saved.asked||0;sv={res:saved.res||{},cur:saved.cur||null};en=saved.en!=null?saved.en:CONFIG.energyMax;mo=saved.mo||0;ru=saved.ru||{};if(saved.rcur){ru[saved.rcur]=1;lockedMsg=true}
+    
+    if(sv.cur){const c=sv.cur;(sv.res[c.b]=sv.res[c.b]||{})[c.i]=0;asked++;streak=0;en=Math.max(0,en-CONFIG.wrongCost);sv.cur=null;lockedMsg=true}
+    BLD.forEach((b,i)=>{const q=sv.res[b.id];if(q&&Object.keys(q).length>=QN[i]&&!done[b.id]){done[b.id]=1;xp+=Object.values(q).every(v=>v===1)?20:5}})}
+  persist();
+  $('#join').classList.add('hide');const rv=$('#reveal');rv.classList.remove('hide');
+  rv.innerHTML=`<div class="panel pop"><p class="sub" style="margin:0">${saved?'👋 Welcome back! Your progress is saved':'🎲 Your random school &amp; role'}</p>${lockedMsg?'<div class="lock">⚠️ You left a question without answering, so it was counted wrong and is now locked.</div>':''}
+  <div style="display:flex;gap:14px;align-items:center;margin:8px 0"><div style="width:84px;flex:none">${avSvg(me.av)}</div><div><span class="chip" style="background:${SCH.color}">${SCH.name}</span><h2 style="margin:6px 0 0;font-size:25px">${r.ic} ${r.title}</h2><small style="font-weight:600;opacity:.75">${name}</small></div></div>
+  <div class="item"><span style="font-size:24px">📰</span><div>Topic: ${THEME_NAME[SCH.theme]}<small>${SCH.situation}</small></div></div>
+  <div class="item"><span style="font-size:24px">⭐</span><div>${r.ability}<small>${r.desc}</small></div></div>
+  <div class="lock">🔒 Secret clue: ${r.clues[0]}</div>
+  <button class="btn y" id="enter" style="width:100%;margin-top:16px">Enter ${SCH.name} ▶</button></div>`;
+  $('#enter').onclick=enterWorld;
+}
+function enterWorld(){
+  $('#reveal').classList.add('hide');$('#game').classList.remove('hide');t0=Date.now();
+  $('#world').style.background=SCH.grass;$('#sch').textContent=ROLES[me.rl].ic+' '+SCH.short;const name=me.name;
+  $('#map').innerHTML=mapSVG();
+  BLD.forEach(b=>{const e=addEnt('npc-'+b.id,b.npc,b.npc.n,MARK);place('npc-'+b.id,b.nx,b.ny,false,0,-1)});
+  BLD.forEach(b=>{if(done[b.id]){const o=$('#ok-'+b.id);if(o)o.setAttribute('opacity','1');const m=ents['npc-'+b.id],mk=m&&m.g.querySelector('.npcm');if(mk)mk.remove()}});
+  addEnt('me',AV[me.av],name+' (you)');
+  const nodes=[];[120,335,500,665,880].forEach(x=>[200,435,655].forEach(y=>nodes.push([x,y])));
+  ['Rina','Dimas','Putri'].forEach((n,i)=>{const s=nodes[[1,4,10][i]];bots.push({id:'bot'+i,name:n,av:[2,5,3][i],x:s[0],y:s[1],tx:s[0],ty:s[1],xp:[20,10,30][i],nx:8000+i*3000,nodes,f:1});addEnt('bot'+i,AV[[2,5,3][i]],n)});
+  Net.start(me.room,me);hud();
+  addEventListener('keydown',e=>{if($('#game').classList.contains('hide'))return;const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=1;if(k==='e'||k===' '){const b=nearNPC();if(b&&$('#modal').classList.contains('hide')){e.preventDefault();talk(b.id)}}if(k.startsWith('Arrow'))e.preventDefault()});
+  addEventListener('keyup',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=0});
+  $('#world').addEventListener('pointerdown',e=>{if(!$('#modal').classList.contains('hide'))return;if(tab!=='map')panel('map');
+    const sv=$('#world'),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const w=pt.matrixTransform(sv.getScreenCTM().inverse());me.tx=clamp(w.x,20,980);me.ty=clamp(w.y,48,692)});
+  $('#talkbtn').onclick=()=>talk($('#talkbtn').dataset.b);
+  document.querySelectorAll('.emotes button').forEach(b=>b.onclick=()=>{me.emo=b.dataset.e;me.emt=Date.now();showEmote('me',me.emo);lastSend=0});
+  $('#press').onclick=reporterAsk;$('#stealbtn').onclick=()=>stealTo($('#stealbtn').dataset.id);schedRep(true);$('#n-map').onclick=()=>panel('map');$('#n-mis').onclick=()=>panel('mis');$('#n-rank').onclick=()=>panel('rank');$('#peerpill').onclick=()=>panel('rank');
+  requestAnimationFrame(frame);
+  setTimeout(()=>{open(`<div class="who">${npcPortrait(BLD[0])}<div class="bubble"><b class="nm">${BLD[0].npc.n} · Principal</b>Welcome to ${SCH.name}, ${name}! 🎒 ${SCH.situation} Walk to each building (tap the map or use WASD / arrows) and talk to the characters with the <b>!</b> sign. Finish all 9 missions! Wrong answers cost 🔋 energy — earn 💰 from reporter questions and refuel at the Canteen 🍜.</div></div><div class="row" style="margin-top:14px"><button class="btn y" id="ok">Let's explore!</button></div>`);$('#ok').onclick=close},300);
+}
+init();
+</script>
+</body>
+</html>
