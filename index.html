@@ -871,7 +871,7 @@ function panel(t){
 
 /* ---------- Start: random school + role, then reveal ---------- */
 const cfgFb=()=>(CONFIG.firebase||lsGet('hh_fb')).trim().replace(/\/$/,'');
-const cfgGas=()=>(CONFIG.gas||lsGet('hh_gas')).trim();
+const cfgGas=()=>(lsGet('hh_gas')||CONFIG.gas||'').trim();
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 async function assign(room){
   let peers={};const fb=cfgFb();
