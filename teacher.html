@@ -101,10 +101,18 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
     <div class="panel-head"><div><h2>🏁 End Game & Celebration</h2><div class="sub">Close the classroom session and show a shared congratulations screen</div></div><span class="tag">SESSION ENDING</span></div>
     <div class="endgame-grid">
       <div class="endgame-action">
+        <h3>Teacher Sign-in</h3>
+        <p>Sign in with the teacher account registered in Firebase Authentication. The dashboard checks the account UID before enabling session controls.</p>
+        <input id="teacherEmail" type="email" autocomplete="username" placeholder="Teacher email" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:4px 0 8px">
+        <input id="teacherPassword" type="password" autocomplete="current-password" placeholder="Teacher password" style="width:100%;padding:11px;border:1px solid var(--line);border-radius:9px;margin:0 0 8px">
+        <button id="teacherLogin" class="refresh" style="width:100%">Sign in</button>
+        <div id="teacherAuthStatus" class="endgame-note">Not signed in. Credentials are sent directly to Firebase Authentication, not stored in this page.</div>
+        <button id="teacherLogout" class="refresh" style="width:100%;margin-top:8px;display:none">Sign out</button>
+        <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
         <h3>End the Game for Everyone</h3>
-        <p>When activated, every connected student's game should stop, their progress should be preserved, and the congratulations screen should appear across all rooms.</p>
-        <button class="end-btn" disabled>🔒 END GAME · TEACHER AUTH REQUIRED</button>
-        <div class="endgame-note">The student-side end-game screen is now integrated. This control remains locked until this dashboard signs in with your Firebase teacher account and Firebase Rules restrict session writes to that teacher account. No unauthenticated end-game command is sent.</div>
+        <p>Once signed in and authorized, this sends a session-ending signal to every connected student.</p>
+        <button id="endGameBtn" class="end-btn" disabled>🔒 SIGN IN TO END GAME</button>
+        <div class="endgame-note">Requires Firebase Realtime Database Rules to restrict /teacher_control/session writes to the authorized teacher UID. Until those Rules are installed, the end-game command remains disabled.</div>
       </div>
       <div class="congrats-preview" aria-label="Congratulations screen preview">
         <div class="trophy">🏆🎉</div>
@@ -127,10 +135,15 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
   <div class="footer">HARAPAN HIGH SQUAD · TEACHER ADMIN · LIVE DATA REFRESHES EVERY 3 SECONDS</div>
 </main>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 (function(){
 'use strict';
 var DB='https://analyticalexposition2-default-rtdb.asia-southeast1.firebasedatabase.app';
+var FIREBASE_CONFIG={apiKey:'AIzaSyAOGCr8eNdqkKV7j9BUGoc8_JmfsggNsa8',authDomain:'analyticalexposition2.firebaseapp.com',databaseURL:DB,projectId:'analyticalexposition2',storageBucket:'analyticalexposition2.firebasestorage.app',messagingSenderId:'616024434967',appId:'1:616024434967:web:5759edcdce6cc5113bef52'};
+var TEACHER_UID='iAktNjEp6FfqhGYUFVduxbRS3B72';
+var teacherAuth=null,teacherUser=null,teacherRulesReady=false;
 var latest=[];
 var $=function(id){return document.getElementById(id)};
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -169,6 +182,60 @@ async function load(){
   var data=await res.json();paint(data||{});$('connection').textContent='LIVE CONNECTION';
  }catch(e){$('connection').textContent='CONNECTION ERROR';$('roomMaps').innerHTML='<div class="empty">Could not read Firebase data. Check the database URL and read permissions. '+esc(e.message)+'</div>'}
 }
+
+function setTeacherAuthUI(message){
+  $('teacherAuthStatus').textContent=message;
+  $('teacherLogin').style.display=teacherUser?'none':'block';
+  $('teacherLogout').style.display=teacherUser?'block':'none';
+  $('teacherEmail').style.display=teacherUser?'none':'block';
+  $('teacherPassword').style.display=teacherUser?'none':'block';
+  $('endGameBtn').disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady);
+  $('endGameBtn').textContent=$('endGameBtn').disabled?'🔒 WAITING FOR DATABASE RULES':'🏁 END GAME FOR EVERYONE';
+}
+async function initTeacherAuth(){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    teacherAuth=firebase.auth();
+    teacherAuth.onAuthStateChanged(async user=>{
+      teacherUser=user||null;
+      if(user&&user.uid!==TEACHER_UID){
+        await teacherAuth.signOut();teacherUser=null;
+        setTeacherAuthUI('This Firebase account is not authorized as the teacher account.');
+        return;
+      }
+      if(user){
+        try{
+          const token=await user.getIdToken();
+          const test=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{cache:'no-store'});
+          teacherRulesReady=test.ok;
+          if(!test.ok)throw new Error('Rules do not allow authenticated teacher access yet.');
+          setTeacherAuthUI('Signed in as authorized teacher. Database access check passed. End-game stays locked until teacher-only write Rules are verified.');
+        }catch(e){teacherRulesReady=false;setTeacherAuthUI('Signed in, but database Rules are not ready: '+e.message);}
+      }else{teacherRulesReady=false;setTeacherAuthUI('Not signed in.');}
+    });
+  }catch(e){setTeacherAuthUI('Firebase Authentication could not initialize: '+e.message);}
+}
+$('teacherLogin').addEventListener('click',async()=>{
+  const email=$('teacherEmail').value.trim(),password=$('teacherPassword').value;
+  if(!email||!password){setTeacherAuthUI('Enter your teacher email and password.');return}
+  $('teacherLogin').disabled=true;
+  try{await teacherAuth.signInWithEmailAndPassword(email,password)}
+  catch(e){setTeacherAuthUI('Sign-in failed: '+e.message)}
+  finally{$('teacherLogin').disabled=false}
+});
+$('teacherLogout').addEventListener('click',()=>teacherAuth&&teacherAuth.signOut());
+$('endGameBtn').addEventListener('click',async()=>{
+  if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)return;
+  if(!confirm('End the game for ALL connected students in every room? This will show the congratulations screen.'))return;
+  const token=await teacherUser.getIdToken(true);
+  const response=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'ended',endedAt:Date.now(),message:'MISSION ACCOMPLISHED!'} )});
+  if(!response.ok){setTeacherAuthUI('Could not end the game. Check Firebase Rules and teacher authorization.');return}
+  $('endGameBtn').textContent='✓ GAME ENDED';
+  $('endGameBtn').disabled=true;
+  $('teacherAuthStatus').textContent='End-game signal sent. Students will receive it on their next control poll.';
+});
+initTeacherAuth();
+
 $('refresh').addEventListener('click',load);
 $('search').addEventListener('input',render);$('roomFilter').addEventListener('change',render);$('statusFilter').addEventListener('change',render);
 load();setInterval(load,3000);
