@@ -58,7 +58,7 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
     <a href="#endgame"><span>🏁</span>End Game</a>
     <a href="#controls"><span>⚑</span>Moderation & Controls</a>
   </nav>
-  <div class="side-bottom"><b>Teacher Control Center</b>Monitoring mode is active. End-game and administrative actions require student-side integration and secure teacher authentication.</div>
+  <div class="side-bottom"><b>Teacher Control Center</b>Monitoring mode is active. Student end-game screen integrated · teacher command awaits secure authentication.</div>
 </aside>
 <main>
   <header class="topbar" id="overview">
@@ -103,8 +103,8 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
       <div class="endgame-action">
         <h3>End the Game for Everyone</h3>
         <p>When activated, every connected student's game should stop, their progress should be preserved, and the congratulations screen should appear across all rooms.</p>
-        <button class="end-btn" disabled>🔒 END GAME · INTEGRATION REQUIRED</button>
-        <div class="endgame-note">This control is intentionally locked in this dashboard version. The student game must first listen for a teacher-issued end-game signal, and Firebase must enforce teacher-only write access. No command is sent from this page yet.</div>
+        <button class="end-btn" disabled>🔒 END GAME · TEACHER AUTH REQUIRED</button>
+        <div class="endgame-note">The student-side end-game screen is now integrated. This control remains locked until this dashboard signs in with your Firebase teacher account and Firebase Rules restrict session writes to that teacher account. No unauthenticated end-game command is sent.</div>
       </div>
       <div class="congrats-preview" aria-label="Congratulations screen preview">
         <div class="trophy">🏆🎉</div>
