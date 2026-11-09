@@ -709,7 +709,22 @@ const REP=[];VERBS.forEach((v,k)=>{[[1,0,'What is the V2 (past form) of “'+v[0
   REP.push({id:k+'-'+t,q,options:[a,...o.slice(0,3)],answer:0,fb:v.join(' – ')+' (V1 – V2 – V3)'})})});
 function toast(t){const m=$('#msg');m.textContent=t;m.classList.remove('hide');clearTimeout(msgT);msgT=setTimeout(()=>m.classList.add('hide'),4500)}
 
-let teacherControl={paused:false,kicked:false,lastBroadcast:null};
+let teacherControl={paused:false,kicked:false,ended:false,lastBroadcast:null};
+let endScreenShown=false;
+function showGameEnded(session){
+  if(teacherControl.ended)return;
+  teacherControl.ended=true;
+  try{persist()}catch(e){}
+  if(teacherPollTimer){clearInterval(teacherPollTimer);teacherPollTimer=null}
+  const old=document.getElementById('gameEndedOverlay');if(old)old.remove();
+  const overlay=document.createElement('div');
+  overlay.id='gameEndedOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:999999;background:linear-gradient(145deg,#17243b,#263d5e);display:flex;align-items:center;justify-content:center;padding:22px;color:#fff;text-align:center;font-family:inherit;';
+  overlay.innerHTML='<div style="max-width:560px;width:100%;padding:clamp(24px,5vw,48px);border:1px solid rgba(255,255,255,.18);border-radius:26px;background:rgba(255,255,255,.08);box-shadow:0 20px 70px rgba(0,0,0,.25)"><div style="font-size:clamp(42px,8vw,68px)">🏆🎉</div><div style="font-size:12px;letter-spacing:3px;font-weight:800;color:#f3bd4c;margin:12px 0">HARAPAN HIGH SQUAD</div><h1 style="font-size:clamp(28px,6vw,44px);line-height:1.1;margin:8px 0 14px">MISSION ACCOMPLISHED!</h1><p style="font-size:clamp(14px,2.5vw,17px);line-height:1.7;color:#e1e9f4;margin:0 0 10px">Congratulations, everyone! You\'ve completed your mission in Harapan High Squad.</p><p style="font-size:14px;line-height:1.7;color:#c8d5e7">Your teamwork, creativity, and determination made this adventure possible.</p><div style="margin-top:22px;font-size:15px;font-weight:800;color:#f3bd4c">GREAT JOB, '+String(me&&me.name||'STUDENT').replace(/[&<>"]/g,'')+'! 👏</div><div style="margin-top:25px;font-size:11px;color:#aebed2">Your progress has been saved. Please wait for your teacher’s next instruction.</div></div>';
+  document.body.appendChild(overlay);
+  $('#game').classList.add('hide');
+}
+
 let teacherPollTimer=null;
 function updateTeacherControlUI(){
   $('#teacherPause').classList.toggle('hide',!teacherControl.paused||teacherControl.kicked);
@@ -721,7 +736,7 @@ function showTeacherBroadcast(data){
   $('#teacherNotice').classList.remove('hide');
 }
 async function pollTeacherControls(){
-  if(!me||!Net.url||Net.mode!=='cloud')return;
+  if(!me||!Net.url||Net.mode!=='cloud'||teacherControl.ended)return;
   try{
     const base=Net.url+'/teacher_control';
     const [sessionRes,broadcastRes,kickRes]=await Promise.all([
@@ -731,6 +746,7 @@ async function pollTeacherControls(){
     const session=await sessionRes.json();
     const broadcast=await broadcastRes.json();
     const kick=await kickRes.json();
+    if(session&&session.status==='ended'){showGameEnded(session);return;}
     teacherControl.paused=!!(session&&session.status==='paused');
     if(broadcast&&broadcast.id&&broadcast.id!==teacherControl.lastBroadcast){
       teacherControl.lastBroadcast=broadcast.id;
