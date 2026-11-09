@@ -29,6 +29,20 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
 .footer{text-align:center;color:#9aa5b4;font-size:10px;margin-top:20px}
 @media(max-width:1050px){.shell{grid-template-columns:205px 1fr}.content-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.shell{display:block}.sidebar{padding:13px 15px;gap:12px}.brand{padding:0}.nav-label,.side-bottom{display:none}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap;padding:9px 10px;font-size:11px}.nav a span{font-size:15px;width:auto}main{padding:20px 13px}.topbar{align-items:flex-start}.top-actions{flex-direction:column;align-items:flex-end}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.panel{padding:14px}.control-grid{grid-template-columns:1fr}.room-grid{grid-template-columns:1fr}}
+
+.endgame-panel{border:1px solid #f0d6d4;background:linear-gradient(135deg,#fff 0%,#fff8f6 100%)}
+.endgame-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.9fr);gap:15px}
+.endgame-action{border:1px solid #f1d5d2;border-radius:14px;padding:16px;background:#fff}
+.endgame-action h3{font:700 15px "Space Grotesk";margin:0 0 7px}
+.endgame-action p{font-size:11px;line-height:1.55;color:var(--muted)}
+.end-btn{width:100%;padding:12px;border-radius:10px;background:#f4e5e4;color:#a75a55;font-weight:800;font-size:11px;cursor:not-allowed}
+.congrats-preview{border-radius:14px;background:#17243b;color:#fff;padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:210px}
+.congrats-preview .trophy{font-size:34px}
+.congrats-preview h3{font:700 21px "Space Grotesk";margin:8px 0}
+.congrats-preview p{font-size:11px;line-height:1.7;color:#d3ddec;margin:5px 0}
+.endgame-note{font-size:10px;color:#a56b20;margin-top:10px;line-height:1.5}
+@media(max-width:700px){.endgame-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -41,9 +55,10 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
     <a href="#live-map"><span>⌖</span>Global Live Map</a>
     <a href="#students"><span>♙</span>Student Monitor</a>
     <a href="#broadcast"><span>◉</span>Broadcast Center</a>
+    <a href="#endgame"><span>🏁</span>End Game</a>
     <a href="#controls"><span>⚑</span>Moderation & Controls</a>
   </nav>
-  <div class="side-bottom"><b>Teacher Control Center</b>Monitoring mode is active. Administrative actions will be enabled after secure teacher authentication is configured.</div>
+  <div class="side-bottom"><b>Teacher Control Center</b>Monitoring mode is active. End-game and administrative actions require student-side integration and secure teacher authentication.</div>
 </aside>
 <main>
   <header class="topbar" id="overview">
@@ -80,6 +95,25 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
       <div class="control-card"><div class="ico">🚨</div><b>Emergency Broadcast</b><p>Urgent announcement with a pause-style attention screen.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
     </div>
     <div class="locked">Broadcast delivery is prepared on the student side. Sending is disabled until secure teacher write permissions are configured.</div>
+  </section>
+
+  <section class="panel endgame-panel" id="endgame" style="margin-bottom:17px">
+    <div class="panel-head"><div><h2>🏁 End Game & Celebration</h2><div class="sub">Close the classroom session and show a shared congratulations screen</div></div><span class="tag">SESSION ENDING</span></div>
+    <div class="endgame-grid">
+      <div class="endgame-action">
+        <h3>End the Game for Everyone</h3>
+        <p>When activated, every connected student's game should stop, their progress should be preserved, and the congratulations screen should appear across all rooms.</p>
+        <button class="end-btn" disabled>🔒 END GAME · INTEGRATION REQUIRED</button>
+        <div class="endgame-note">This control is intentionally locked in this dashboard version. The student game must first listen for a teacher-issued end-game signal, and Firebase must enforce teacher-only write access. No command is sent from this page yet.</div>
+      </div>
+      <div class="congrats-preview" aria-label="Congratulations screen preview">
+        <div class="trophy">🏆🎉</div>
+        <h3>MISSION ACCOMPLISHED!</h3>
+        <p>Congratulations, everyone! You've completed your mission in Harapan High Squad.</p>
+        <p>Your teamwork, creativity, and determination made this adventure possible.</p>
+        <p><b>GREAT JOB, EVERYONE! 👏</b></p>
+      </div>
+    </div>
   </section>
   <section class="panel" id="controls">
     <div class="panel-head"><div><h2>Moderation & Game Controls</h2><div class="sub">Teacher-only actions for the entire classroom</div></div><span class="tag">TEACHER ONLY</span></div>
