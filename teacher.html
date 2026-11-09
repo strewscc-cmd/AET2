@@ -205,11 +205,9 @@ async function initTeacherAuth(){
       }
       if(user){
         try{
-          const token=await user.getIdToken();
-          const test=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{cache:'no-store'});
-          teacherRulesReady=test.ok;
-          if(!test.ok)throw new Error('Rules do not allow authenticated teacher access yet.');
-          setTeacherAuthUI('Signed in as authorized teacher. Database access check passed. End-game stays locked until teacher-only write Rules are verified.');
+          await user.getIdToken();
+          teacherRulesReady=false;
+          setTeacherAuthUI('Signed in as the authorized teacher. End-game remains locked until teacher-only Firebase write Rules are installed and verified.');
         }catch(e){teacherRulesReady=false;setTeacherAuthUI('Signed in, but database Rules are not ready: '+e.message);}
       }else{teacherRulesReady=false;setTeacherAuthUI('Not signed in.');}
     });
