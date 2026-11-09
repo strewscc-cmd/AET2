@@ -205,9 +205,13 @@ async function initTeacherAuth(){
       }
       if(user){
         try{
-          await user.getIdToken();
-          teacherRulesReady=false;
-          setTeacherAuthUI('Signed in as the authorized teacher. End-game remains locked until teacher-only Firebase write Rules are installed and verified.');
+          const token=await user.getIdToken(true);
+          const probePath=DB+'/_teacher_permission_probe/'+encodeURIComponent(user.uid)+'.json?auth='+encodeURIComponent(token);
+          const probe=await fetch(probePath,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({checkedAt:Date.now()})});
+          if(!probe.ok)throw new Error('Teacher-only database write permission is not active yet. Update Firebase Realtime Database Rules first.');
+          await fetch(probePath,{method:'DELETE'});
+          teacherRulesReady=true;
+          setTeacherAuthUI('Signed in as the authorized teacher. Teacher database write permission verified.');
         }catch(e){teacherRulesReady=false;setTeacherAuthUI('Signed in, but database Rules are not ready: '+e.message);}
       }else{teacherRulesReady=false;setTeacherAuthUI('Not signed in.');}
     });
