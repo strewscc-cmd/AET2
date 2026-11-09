@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher Admin · Harapan High Squad</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#17243b;--navy2:#223550;--ink:#1d2a40;--muted:#718096;--bg:#f3f6fa;--card:#fff;--line:#e5eaf1;--yellow:#f3bd4c;--green:#249b69;--red:#dc5b56;--blue:#477fca;--shadow:0 8px 28px rgba(25,43,69,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif}
+button,input{font:inherit}button{cursor:pointer;border:0}
+.shell{min-height:100vh;display:grid;grid-template-columns:250px 1fr}
+.sidebar{background:var(--navy);color:#fff;padding:25px 17px;display:flex;flex-direction:column;gap:26px}
+.brand{display:flex;gap:12px;align-items:center;padding:0 8px}.brand-mark{width:42px;height:42px;border-radius:13px;background:var(--yellow);color:var(--navy);display:grid;place-items:center;font-size:22px}.brand b{display:block;font:700 15px 'Space Grotesk'}.brand small{color:#aab8cb;font-size:10px;letter-spacing:1.3px}
+.nav-label{font-size:10px;color:#8fa0b8;letter-spacing:1.5px;font-weight:800;padding:0 12px;margin-bottom:-15px}
+.nav{display:grid;gap:6px}.nav a{color:#cbd5e1;text-decoration:none;padding:12px;border-radius:11px;display:flex;gap:12px;align-items:center;font-weight:600;font-size:13px}.nav a.active,.nav a:hover{background:#2a3c58;color:#fff}.nav a span{font-size:18px;width:22px;text-align:center}
+.side-bottom{margin-top:auto;background:#223550;border:1px solid #354a68;border-radius:14px;padding:13px;font-size:11px;color:#c3cede;line-height:1.5}.side-bottom b{color:#fff;display:block;font-size:12px;margin-bottom:4px}
+main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:26px}.eyebrow{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1.4px}.topbar h1{font:700 clamp(23px,3vw,31px) 'Space Grotesk';margin:4px 0 0}.top-actions{display:flex;align-items:center;gap:10px}.live-pill{border:1px solid #bde6d3;background:#e9f8f0;color:#17774e;border-radius:30px;padding:8px 12px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;background:#2eb477;border-radius:50%;box-shadow:0 0 0 4px #c9efdc}.refresh{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink);font-weight:700;font-size:12px}
+.notice{background:#fff8e8;border:1px solid #f2dfb3;color:#755a1c;border-radius:12px;padding:12px 15px;font-size:12px;line-height:1.5;margin-bottom:20px}.notice b{display:block;margin-bottom:3px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:17px}.stat-head{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px;font-weight:700}.stat-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#eef3fa;font-size:17px}.stat strong{display:block;font:700 29px 'Space Grotesk';margin:10px 0 2px}.stat small{color:var(--muted);font-size:10px}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,.8fr);gap:16px;margin-bottom:17px}.panel{padding:18px;min-width:0}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:15px}.panel h2{font:700 16px 'Space Grotesk';margin:0}.sub{color:var(--muted);font-size:11px;margin-top:4px}.tag{background:#eef3fa;color:#52647c;border-radius:20px;padding:6px 9px;font-size:10px;font-weight:800;white-space:nowrap}
+.room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}.room-card{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fbfcfe}.room-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line)}.room-head b{font-size:12px}.room-head small{color:var(--muted);font-size:10px}.room-map{display:block;width:100%;background:#a4d98a;aspect-ratio:1.43}.room-foot{padding:9px 12px;display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.room-map .road{fill:#f0d9a4}.room-map .building{fill:#e8b85d;stroke:#725c40;stroke-width:3}.room-map .player{stroke:#fff;stroke-width:3}.room-map .player-label{font-size:20px;font-weight:bold;fill:#24344a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.activity{display:grid;gap:12px}.activity-item{display:flex;gap:10px;align-items:flex-start}.activity-ico{width:30px;height:30px;border-radius:9px;background:#eef3fa;display:grid;place-items:center;flex:none}.activity-item b{font-size:11px;display:block}.activity-item small{color:var(--muted);font-size:10px}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:13px}.search{min-width:190px;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;outline:0;font-size:12px}.filter{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);font-size:12px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#8290a2;font-size:10px;letter-spacing:.7px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:11px}tbody tr:last-child td{border-bottom:0}.student{display:flex;align-items:center;gap:9px;font-weight:700}.avatar{width:30px;height:30px;border-radius:10px;background:#eaf0fa;display:grid;place-items:center}.status{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}.status.online{background:#e7f7ee;color:#1b8056}.status.offline{background:#f0f2f5;color:#667085}.status.idle{background:#fff4df;color:#956816}.status.completed{background:#e9efff;color:#4665a7}
+.empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.control-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fafbfd}.control-card .ico{font-size:21px;margin-bottom:9px}.control-card b{display:block;font-size:12px}.control-card p{font-size:10px;color:var(--muted);line-height:1.5;min-height:31px}.control-card button{width:100%;padding:9px;border-radius:9px;background:#e9edf3;color:#8792a1;font-size:10px;font-weight:800;cursor:not-allowed}.locked{font-size:10px;color:#a56b20;margin-top:10px}
+.footer{text-align:center;color:#9aa5b4;font-size:10px;margin-top:20px}
+@media(max-width:1050px){.shell{grid-template-columns:205px 1fr}.content-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.shell{display:block}.sidebar{padding:13px 15px;gap:12px}.brand{padding:0}.nav-label,.side-bottom{display:none}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap;padding:9px 10px;font-size:11px}.nav a span{font-size:15px;width:auto}main{padding:20px 13px}.topbar{align-items:flex-start}.top-actions{flex-direction:column;align-items:flex-end}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.panel{padding:14px}.control-grid{grid-template-columns:1fr}.room-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">🎓</div><div><b>TEACHER ADMIN</b><small>HARAPAN HIGH SQUAD</small></div></div>
+  <div class="nav-label">WORKSPACE</div>
+  <nav class="nav">
+    <a class="active" href="#overview"><span>▦</span>Overview</a>
+    <a href="#live-map"><span>⌖</span>Global Live Map</a>
+    <a href="#students"><span>♙</span>Student Monitor</a>
+    <a href="#broadcast"><span>◉</span>Broadcast Center</a>
+    <a href="#controls"><span>⚑</span>Moderation & Controls</a>
+  </nav>
+  <div class="side-bottom"><b>Teacher Control Center</b>Monitoring mode is active. Administrative actions will be enabled after secure teacher authentication is configured.</div>
+</aside>
+<main>
+  <header class="topbar" id="overview">
+    <div><div class="eyebrow">CLASSROOM COMMAND CENTER</div><h1>Good day, Teacher Admin.</h1></div>
+    <div class="top-actions"><div class="live-pill"><span class="dot"></span><span id="connection">CONNECTING</span></div><button class="refresh" id="refresh">↻ Refresh</button></div>
+  </header>
+  <div class="notice"><b>Read-only monitoring preview</b>This page can read the existing multiplayer room data. Broadcast, pause, and kick controls are displayed but intentionally locked until teacher authentication and Firebase Security Rules are configured. A public GitHub Pages page must not contain a teacher password or unrestricted write access.</div>
+  <section class="stats">
+    <div class="stat"><div class="stat-head">DETECTED PLAYERS <span class="stat-icon">♙</span></div><strong id="total">—</strong><small>Players found in Firebase room data</small></div>
+    <div class="stat"><div class="stat-head">ONLINE NOW <span class="stat-icon">●</span></div><strong id="online">—</strong><small>Heartbeat within 15 seconds</small></div>
+    <div class="stat"><div class="stat-head">ACTIVE ROOMS <span class="stat-icon">▦</span></div><strong id="rooms">—</strong><small>Rooms containing player records</small></div>
+    <div class="stat"><div class="stat-head">COMPLETED <span class="stat-icon">🏆</span></div><strong id="completed">—</strong><small>Players who finished all missions</small></div>
+  </section>
+  <section class="content-grid">
+    <div class="panel" id="live-map">
+      <div class="panel-head"><div><h2>Global Live Map</h2><div class="sub">All detected rooms · character coordinates from the game</div></div><span class="tag">ALL ROOMS</span></div>
+      <div id="roomMaps" class="room-grid"><div class="empty">Waiting for Firebase room data…</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><h2>Live Snapshot</h2><div class="sub">Latest classroom activity</div></div><span class="tag">AUTO UPDATE</span></div>
+      <div class="activity" id="activity"><div class="empty">No activity data yet.</div></div>
+    </div>
+  </section>
+  <section class="panel" id="students" style="margin-bottom:17px">
+    <div class="panel-head"><div><h2>Student Monitor</h2><div class="sub">Search and filter students across all rooms</div></div><span class="tag" id="lastUpdate">NOT UPDATED</span></div>
+    <div class="toolbar"><input class="search" id="search" placeholder="Search student name or ID…"><select class="filter" id="roomFilter"><option value="">All rooms</option></select><select class="filter" id="statusFilter"><option value="">All statuses</option><option value="online">Online</option><option value="idle">Idle</option><option value="offline">Offline</option><option value="completed">Completed</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>ROOM</th><th>STATUS</th><th>PROGRESS</th><th>XP</th><th>POSITION</th><th>LAST SEEN</th></tr></thead><tbody id="studentRows"><tr><td colspan="7" class="empty">Waiting for students…</td></tr></tbody></table></div>
+  </section>
+  <section class="panel" id="broadcast" style="margin-bottom:17px">
+    <div class="panel-head"><div><h2>Broadcast Center</h2><div class="sub">Global announcement composer · all rooms</div></div><span class="tag">ALL ROOMS</span></div>
+    <div class="control-grid">
+      <div class="control-card"><div class="ico">📣</div><b>Normal Announcement</b><p>Send a regular classroom reminder to all players.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+      <div class="control-card"><div class="ico">⚠️</div><b>Important Message</b><p>Display a priority popup that students must acknowledge.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+      <div class="control-card"><div class="ico">🚨</div><b>Emergency Broadcast</b><p>Urgent announcement with a pause-style attention screen.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+    </div>
+    <div class="locked">Broadcast delivery is prepared on the student side. Sending is disabled until secure teacher write permissions are configured.</div>
+  </section>
+  <section class="panel" id="controls">
+    <div class="panel-head"><div><h2>Moderation & Game Controls</h2><div class="sub">Teacher-only actions for the entire classroom</div></div><span class="tag">TEACHER ONLY</span></div>
+    <div class="control-grid">
+      <div class="control-card"><div class="ico">⏸️</div><b>Pause All Rooms</b><p>Temporarily freeze student movement and game interactions.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+      <div class="control-card"><div class="ico">▶️</div><b>Resume All Rooms</b><p>Resume the game for every connected student.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+      <div class="control-card"><div class="ico">🚪</div><b>Remove Student</b><p>Remove a selected student from their current room.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+    </div>
+    <div class="locked">No student can be kicked, paused, or modified from this preview. Secure authorization is required before enabling these actions.</div>
+  </section>
+  <div class="footer">HARAPAN HIGH SQUAD · TEACHER ADMIN · LIVE DATA REFRESHES EVERY 3 SECONDS</div>
+</main>
+</div>
+<script>
+(function(){
+'use strict';
+var DB='https://analyticalexposition2-default-rtdb.asia-southeast1.firebasedatabase.app';
+var latest=[];
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function age(ts){var n=Date.now()-Number(ts||0);if(!ts)return 'Unknown';if(n<5000)return 'just now';if(n<60000)return Math.round(n/1000)+'s ago';return Math.round(n/60000)+'m ago'}
+function state(p){var ageMs=Date.now()-Number(p.ts||0);if(p.status==='completed'||Number(p.done)>=9)return 'completed';if(ageMs>15000)return 'offline';if(ageMs>5000)return 'idle';return 'online'}
+function markerColor(p){var st=state(p);return st==='online'?'#249b69':st==='idle'?'#e0a332':st==='completed'?'#477fca':'#8994a5'}
+function roomMap(room,players){
+ var marks=players.map(function(p,i){var x=Math.max(20,Math.min(980,Number(p.x)||0)),y=Math.max(35,Math.min(670,Number(p.y)||0));return '<g><circle class="player" cx="'+x+'" cy="'+y+'" r="13" fill="'+markerColor(p)+'"/><text class="player-label" x="'+x+'" y="'+(y-19)+'" text-anchor="middle">'+esc((p.name||'Student').slice(0,10))+'</text></g>'}).join('');
+ return '<svg class="room-map" viewBox="0 0 1000 700" role="img" aria-label="Map of '+esc(room)+'"><rect width="1000" height="700" fill="#a4d98a"/><path class="road" d="M0 148H1000V254H0zM0 383H1000V489H0zM0 618H1000V700H0zM285 0H385V700H285zM615 0H715V700H615z"/><g class="building"><rect x="75" y="35" width="150" height="80" rx="10"/><rect x="425" y="35" width="150" height="80" rx="10"/><rect x="775" y="35" width="150" height="80" rx="10"/><rect x="75" y="280" width="150" height="80" rx="10"/><rect x="425" y="280" width="150" height="80" rx="10"/><rect x="775" y="280" width="150" height="80" rx="10"/><rect x="75" y="515" width="150" height="80" rx="10"/><rect x="425" y="515" width="150" height="80" rx="10"/><rect x="775" y="515" width="150" height="80" rx="10"/></g>'+marks+'</svg>';
+}
+function render(){
+ var q=$('search').value.toLowerCase(),rf=$('roomFilter').value,sf=$('statusFilter').value;
+ var list=latest.filter(function(p){return (!q||(p.name||'').toLowerCase().includes(q)||p.id.toLowerCase().includes(q))&&(!rf||p.room===rf)&&(!sf||state(p)===sf)});
+ $('studentRows').innerHTML=list.length?list.map(function(p){var st=state(p);return '<tr><td><div class="student"><span class="avatar">👤</span><span>'+esc(p.name||'Unnamed')+'<small style="display:block;color:#8995a5;font-weight:500">'+esc(p.id)+'</small></span></div></td><td>'+esc(p.room)+'</td><td><span class="status '+st+'">'+st.toUpperCase()+'</span></td><td>'+Number(p.done||0)+'/9 missions</td><td><b>'+Number(p.xp||0)+'</b></td><td>'+Math.round(Number(p.x)||0)+', '+Math.round(Number(p.y)||0)+'</td><td>'+age(p.ts)+'</td></tr>'}).join(''):'<tr><td colspan="7" class="empty">No matching player records.</td></tr>';
+}
+function paint(data){
+ var all=[],roomNames=Object.keys(data||{}).sort();
+ roomNames.forEach(function(room){var bucket=data[room]||{};Object.keys(bucket).forEach(function(id){var p=bucket[id];if(p&&p.id)all.push(Object.assign({},p,{id:id,room:room}))})});
+ latest=all;
+ var online=all.filter(function(p){return state(p)==='online'}).length;
+ $('total').textContent=all.length;$('online').textContent=online;$('rooms').textContent=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0}).length;$('completed').textContent=all.filter(function(p){return state(p)==='completed'}).length;
+ var validRooms=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0});
+ $('roomMaps').innerHTML=validRooms.length?validRooms.map(function(room){var people=all.filter(function(p){return p.room===room});var live=people.filter(function(p){return state(p)==='online'}).length;return '<div class="room-card"><div class="room-head"><div><b>'+esc(room)+'</b><br><small>'+people.length+' player record(s)</small></div><span class="status '+(live?'online':'offline')+'">'+live+' ONLINE</span></div>'+roomMap(room,people)+'<div class="room-foot"><span>'+people.filter(function(p){return state(p)==='completed'}).length+' completed</span><span>'+people.filter(function(p){return state(p)==='offline'}).length+' offline</span></div></div>'}).join(''):'<div class="empty">No room data found yet. Students appear after entering the game world.</div>';
+ var options='<option value="">All rooms</option>'+validRooms.map(function(r){return '<option value="'+esc(r)+'">'+esc(r)+'</option>'}).join('');
+ var old=$('roomFilter').value;$('roomFilter').innerHTML=options;if(validRooms.indexOf(old)>=0)$('roomFilter').value=old;
+ var newest=all.slice().sort(function(a,b){return Number(b.ts||0)-Number(a.ts||0)}).slice(0,6);
+ $('activity').innerHTML=newest.length?newest.map(function(p){return '<div class="activity-item"><div class="activity-ico">'+(state(p)==='completed'?'🏆':'🎮')+'</div><div><b>'+esc(p.name||'Student')+' · '+esc(p.room)+'</b><small>'+esc(p.status||'playing')+' · '+Number(p.done||0)+'/9 missions · '+age(p.ts)+'</small></div></div>'}).join(''):'<div class="empty">No players have entered a game room yet.</div>';
+ $('lastUpdate').textContent='UPDATED '+new Date().toLocaleTimeString();
+ render();
+}
+async function load(){
+ $('connection').textContent='SYNCING';
+ try{
+  var res=await fetch(DB+'/hh.json',{cache:'no-store'});
+  if(!res.ok)throw new Error('Firebase returned '+res.status);
+  var data=await res.json();paint(data||{});$('connection').textContent='LIVE CONNECTION';
+ }catch(e){$('connection').textContent='CONNECTION ERROR';$('roomMaps').innerHTML='<div class="empty">Could not read Firebase data. Check the database URL and read permissions. '+esc(e.message)+'</div>'}
+}
+$('refresh').addEventListener('click',load);
+$('search').addEventListener('input',render);$('roomFilter').addEventListener('change',render);$('statusFilter').addEventListener('change',render);
+load();setInterval(load,3000);
+})();
+</script>
+</body>
+</html>
