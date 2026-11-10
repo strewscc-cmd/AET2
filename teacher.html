@@ -24,7 +24,7 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
 .room-map .road{fill:#f0d9a4}.room-map .building{fill:#e8b85d;stroke:#725c40;stroke-width:3}.room-map .player{stroke:#fff;stroke-width:3}.room-map .player-label{font-size:20px;font-weight:bold;fill:#24344a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 .activity{display:grid;gap:12px}.activity-item{display:flex;gap:10px;align-items:flex-start}.activity-ico{width:30px;height:30px;border-radius:9px;background:#eef3fa;display:grid;place-items:center;flex:none}.activity-item b{font-size:11px;display:block}.activity-item small{color:var(--muted);font-size:10px}
 .toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:13px}.search{min-width:190px;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;outline:0;font-size:12px}.filter{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);font-size:12px}
-.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#8290a2;font-size:10px;letter-spacing:.7px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:11px}tbody tr:last-child td{border-bottom:0}.student{display:flex;align-items:center;gap:9px;font-weight:700}.avatar{width:30px;height:30px;border-radius:10px;background:#eaf0fa;display:grid;place-items:center}.status{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}.status.online{background:#e7f7ee;color:#1b8056}.status.offline{background:#f0f2f5;color:#667085}.status.idle{background:#fff4df;color:#956816}.status.completed{background:#e9efff;color:#4665a7}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#8290a2;font-size:10px;letter-spacing:.7px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:11px}.row-action{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:800}.room-delete{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}tbody tr:last-child td{border-bottom:0}.student{display:flex;align-items:center;gap:9px;font-weight:700}.avatar{width:30px;height:30px;border-radius:10px;background:#eaf0fa;display:grid;place-items:center}.status{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}.status.online{background:#e7f7ee;color:#1b8056}.status.offline{background:#f0f2f5;color:#667085}.status.idle{background:#fff4df;color:#956816}.status.completed{background:#e9efff;color:#4665a7}
 .empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.control-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fafbfd}.control-card .ico{font-size:21px;margin-bottom:9px}.control-card b{display:block;font-size:12px}.control-card p{font-size:10px;color:var(--muted);line-height:1.5;min-height:31px}.control-card button{width:100%;padding:9px;border-radius:9px;background:#e9edf3;color:#8792a1;font-size:10px;font-weight:800;cursor:not-allowed}.locked{font-size:10px;color:#a56b20;margin-top:10px}
 .footer{text-align:center;color:#9aa5b4;font-size:10px;margin-top:20px}
 @media(max-width:1050px){.shell{grid-template-columns:205px 1fr}.content-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
@@ -85,7 +85,7 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
   <section class="panel" id="students" style="margin-bottom:17px">
     <div class="panel-head"><div><h2>Student Monitor</h2><div class="sub">Search and filter students across all rooms</div></div><span class="tag" id="lastUpdate">NOT UPDATED</span></div>
     <div class="toolbar"><input class="search" id="search" placeholder="Search student name or ID…"><select class="filter" id="roomFilter"><option value="">All rooms</option></select><select class="filter" id="statusFilter"><option value="">All statuses</option><option value="online">Online</option><option value="idle">Idle</option><option value="offline">Offline</option><option value="completed">Completed</option></select></div>
-    <div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>ROOM</th><th>STATUS</th><th>PROGRESS</th><th>XP</th><th>POSITION</th><th>LAST SEEN</th></tr></thead><tbody id="studentRows"><tr><td colspan="7" class="empty">Waiting for students…</td></tr></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>STUDENT</th><th>ROOM</th><th>STATUS</th><th>PROGRESS</th><th>XP</th><th>POSITION</th><th>LAST SEEN</th><th>ACTION</th></tr></thead><tbody id="studentRows"><tr><td colspan="8" class="empty">Waiting for students…</td></tr></tbody></table></div>
   </section>
   <section class="panel" id="broadcast" style="margin-bottom:17px">
     <div class="panel-head"><div><h2>Broadcast Center</h2><div class="sub">Global announcement composer · all rooms</div></div><span class="tag">ALL ROOMS</span></div>
@@ -162,7 +162,7 @@ function roomMap(room,players){
 function render(){
  var q=$('search').value.toLowerCase(),rf=$('roomFilter').value,sf=$('statusFilter').value;
  var list=latest.filter(function(p){return (!q||(p.name||'').toLowerCase().includes(q)||p.id.toLowerCase().includes(q))&&(!rf||p.room===rf)&&(!sf||state(p)===sf)});
- $('studentRows').innerHTML=list.length?list.map(function(p){var st=state(p);return '<tr><td><div class="student"><span class="avatar">👤</span><span>'+esc(p.name||'Unnamed')+'<small style="display:block;color:#8995a5;font-weight:500">'+esc(p.id)+'</small></span></div></td><td>'+esc(p.room)+'</td><td><span class="status '+st+'">'+st.toUpperCase()+'</span></td><td>'+Number(p.done||0)+'/9 missions</td><td><b>'+Number(p.xp||0)+'</b></td><td>'+Math.round(Number(p.x)||0)+', '+Math.round(Number(p.y)||0)+'</td><td>'+age(p.ts)+'</td></tr>'}).join(''):'<tr><td colspan="7" class="empty">No matching player records.</td></tr>';
+ $('studentRows').innerHTML=list.length?list.map(function(p){var st=state(p);return '<tr><td><div class="student"><span class="avatar">👤</span><span>'+esc(p.name||'Unnamed')+'<small style="display:block;color:#8995a5;font-weight:500">'+esc(p.id)+'</small></span></div></td><td>'+esc(p.room)+'</td><td><span class="status '+st+'">'+st.toUpperCase()+'</span></td><td>'+Number(p.done||0)+'/9 missions</td><td><b>'+Number(p.xp||0)+'</b></td><td>'+Math.round(Number(p.x)||0)+', '+Math.round(Number(p.y)||0)+'</td><td>'+age(p.ts)+'</td><td><button class="row-action" data-remove="'+encodeURIComponent(p.room)+'|'+encodeURIComponent(p.id)+'">REMOVE</button></td></tr>'}).join(''):'<tr><td colspan="7" class="empty">No matching player records.</td></tr>';
 }
 function paint(data){
  var all=[],roomNames=Object.keys(data||{}).sort();
@@ -171,7 +171,7 @@ function paint(data){
  var online=all.filter(function(p){return state(p)==='online'}).length;
  $('total').textContent=all.length;$('online').textContent=online;$('rooms').textContent=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0}).length;$('completed').textContent=all.filter(function(p){return state(p)==='completed'}).length;
  var validRooms=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0});
- $('roomMaps').innerHTML=validRooms.length?validRooms.map(function(room){var people=all.filter(function(p){return p.room===room});var live=people.filter(function(p){return state(p)==='online'}).length;return '<div class="room-card"><div class="room-head"><div><b>'+esc(room)+'</b><br><small>'+people.length+' player record(s)</small></div><span class="status '+(live?'online':'offline')+'">'+live+' ONLINE</span></div>'+roomMap(room,people)+'<div class="room-foot"><span>'+people.filter(function(p){return state(p)==='completed'}).length+' completed</span><span>'+people.filter(function(p){return state(p)==='offline'}).length+' offline</span></div></div>'}).join(''):'<div class="empty">No room data found yet. Students appear after entering the game world.</div>';
+ $('roomMaps').innerHTML=validRooms.length?validRooms.map(function(room){var people=all.filter(function(p){return p.room===room});var live=people.filter(function(p){return state(p)==='online'}).length;return '<div class="room-card"><div class="room-head"><div><b>'+esc(room)+'</b><br><small>'+people.length+' player record(s)</small></div><span class="status '+(live?'online':'offline')+'">'+live+' ONLINE</span></div>'+roomMap(room,people)+'<div class="room-foot"><span>'+people.filter(function(p){return state(p)==='completed'}).length+' completed</span><span>'+people.filter(function(p){return state(p)==='offline'}).length+' offline</span><button class="room-delete" data-delete-room="'+encodeURIComponent(room)+'">DELETE ROOM</button></div></div>'}).join(''):'<div class="empty">No room data found yet. Students appear after entering the game world.</div>';
  var options='<option value="">All rooms</option>'+validRooms.map(function(r){return '<option value="'+esc(r)+'">'+esc(r)+'</option>'}).join('');
  var old=$('roomFilter').value;$('roomFilter').innerHTML=options;if(validRooms.indexOf(old)>=0)$('roomFilter').value=old;
  var newest=all.slice().sort(function(a,b){return Number(b.ts||0)-Number(a.ts||0)}).slice(0,6);
@@ -186,6 +186,41 @@ async function load(){
   if(!res.ok)throw new Error('Firebase returned '+res.status);
   var data=await res.json();paint(data||{});$('connection').textContent='LIVE CONNECTION';
  }catch(e){$('connection').textContent='CONNECTION ERROR';$('roomMaps').innerHTML='<div class="empty">Could not read Firebase data. Check the database URL and read permissions. '+esc(e.message)+'</div>'}
+}
+
+
+async function teacherDelete(path){
+ if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)throw new Error('Teacher authorization required');
+ const token=await teacherUser.getIdToken(true);
+ const res=await fetch(DB+path+'.json?auth='+encodeURIComponent(token),{method:'DELETE'});
+ if(!res.ok)throw new Error('Firebase rejected deletion ('+res.status+')');
+}
+async function removeStudent(room,id){
+ if(!teacherUser||!teacherRulesReady)return alert('Please sign in as the authorized teacher first.');
+ const p=latest.find(x=>x.room===room&&x.id===id);if(!p)return;
+ if(!confirm('Remove '+(p.name||id)+' from '+room+'? Their current room record and queued events will be deleted.'))return;
+ try{
+  const token=await teacherUser.getIdToken(true),now=Date.now();
+  const kick={action:'kick',reason:'Your teacher removed your player record. Please return to the lobby and rejoin the correct room.',createdAt:now,by:teacherUser.uid};
+  let k=await fetch(DB+'/teacher_control/moderation/'+encodeURIComponent(id)+'.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(kick)});
+  if(!k.ok)throw new Error('Could not send removal notice ('+k.status+')');
+  await teacherDelete('/hh/'+encodeURIComponent(room)+'/'+encodeURIComponent(id));
+  await teacherDelete('/hh_ev/'+encodeURIComponent(room)+'/'+encodeURIComponent(id));
+  $('teacherAuthStatus').textContent=(p.name||id)+' removed from '+room+'.';
+  await load();
+ }catch(e){alert('Could not remove student: '+e.message)}
+}
+async function deleteRoom(room){
+ if(!teacherUser||!teacherRulesReady)return alert('Please sign in as the authorized teacher first.');
+ const people=latest.filter(p=>p.room===room),active=people.filter(p=>state(p)==='online'||state(p)==='idle');
+ if(active.length)return alert('Room '+room+' still has '+active.length+' active player(s). Ask them to leave first, then refresh and delete the room.');
+ if(!confirm('Permanently delete room '+room+' and all '+people.length+' player record(s) plus queued room events? This cannot be undone.'))return;
+ try{
+  await teacherDelete('/hh/'+encodeURIComponent(room));
+  await teacherDelete('/hh_ev/'+encodeURIComponent(room));
+  $('teacherAuthStatus').textContent='Room '+room+' deleted.';
+  await load();
+ }catch(e){alert('Could not delete room: '+e.message)}
 }
 
 function setTeacherAuthUI(message){
@@ -257,6 +292,8 @@ $('endGameBtn').addEventListener('click',async()=>{
 });
 initTeacherAuth();
 
+$('studentRows').addEventListener('click',function(e){const b=e.target.closest('[data-remove]');if(!b)return;const parts=b.dataset.remove.split('|');removeStudent(decodeURIComponent(parts[0]),decodeURIComponent(parts[1]));});
+$('roomMaps').addEventListener('click',function(e){const b=e.target.closest('[data-delete-room]');if(b)deleteRoom(decodeURIComponent(b.dataset.deleteRoom));});
 $('refresh').addEventListener('click',load);
 $('search').addEventListener('input',render);$('roomFilter').addEventListener('change',render);$('statusFilter').addEventListener('change',render);
 load();setInterval(load,3000);
