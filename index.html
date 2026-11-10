@@ -696,10 +696,10 @@ function mapSVG(){
 /* ---------- Game state ---------- */
 let me=null,selAv=0,t0=0,done={},xp=0,gems=0,streak=0,correct=0,asked=0;
 /* ---------- Anti-cheat save: progress & locked questions survive refresh ---------- */
-let en=CONFIG.energyMax,mo=0,ru={},rcur=null,repT=null,pressT=null,stealCd=0,stealWait=null,msgT=null;const rp=n=>'Rp'+n.toLocaleString('id-ID');
+let en=CONFIG.energyMax,mo=0,ru={},rcur=null,repT=null,pressT=null,stealCd=0,stealWait=null,msgT=null,snackCount=0,stealsMade=0,stealsReceived=0;const rp=n=>'Rp'+n.toLocaleString('id-ID');
 const SAVE='hh_save_v1';let sv={res:{},cur:null},lockedMsg=false;
 const saveGet=()=>{try{return JSON.parse(localStorage.getItem(SAVE)||'null')}catch(e){return null}};
-function persist(){if(!me)return;try{localStorage.setItem(SAVE,JSON.stringify({id:me.id,name:me.name,room:me.room,av:me.av,sch:me.sch,rl:me.rl,done,xp,gems,streak,correct,asked,res:sv.res,cur:sv.cur,en,mo,ru,rcur}))}catch(e){}}
+function persist(){if(!me)return;try{localStorage.setItem(SAVE,JSON.stringify({id:me.id,name:me.name,room:me.room,av:me.av,sch:me.sch,rl:me.rl,done,xp,gems,streak,correct,asked,res:sv.res,cur:sv.cur,en,mo,ru,rcur,snackCount,stealsMade,stealsReceived}))}catch(e){}}
 const ents={},keys={};let bots=[],lastSend=0,cam={x:0,y:0};
 const poolFor=sc=>{const q=QB[sc.theme],p=Object.values(q).flat(),o=sc.off%p.length;return sc.qs||p.slice(o).concat(p.slice(0,o))};
 const VERBS='go,went,gone;eat,ate,eaten;write,wrote,written;take,took,taken;see,saw,seen;give,gave,given;know,knew,known;come,came,come;run,ran,run;begin,began,begun;drink,drank,drunk;speak,spoke,spoken;break,broke,broken;choose,chose,chosen;drive,drove,driven;fly,flew,flown;forget,forgot,forgotten;buy,bought,bought;bring,brought,brought;teach,taught,taught;think,thought,thought;catch,caught,caught;build,built,built;send,sent,sent;spend,spent,spent;sell,sold,sold;tell,told,told;make,made,made;find,found,found;keep,kept,kept;leave,left,left;lose,lost,lost;meet,met,met;pay,paid,paid;sit,sat,sat;stand,stood,stood;win,won,won;wear,wore,worn;swim,swam,swum;sing,sang,sung;grow,grew,grown;draw,drew,drawn;throw,threw,thrown;steal,stole,stolen;fall,fell,fallen;hide,hid,hidden;ride,rode,ridden;sleep,slept,slept;feel,felt,felt;hear,heard,heard;study,studied,studied;stop,stopped,stopped;carry,carried,carried;plan,planned,planned'.split(';').map(x=>x.split(','));
@@ -716,11 +716,13 @@ function showGameEnded(session){
   teacherControl.ended=true;
   try{persist()}catch(e){}
   if(teacherPollTimer){clearInterval(teacherPollTimer);teacherPollTimer=null}
+  const myAwards=session.awards&&session.awards[me.id]||[];
+  const awardHtml=myAwards.length?'<div style="margin:20px 0 4px;display:grid;gap:8px">'+myAwards.map(a=>'<div style="padding:12px;border-radius:14px;background:rgba(243,189,76,.15);border:1px solid rgba(243,189,76,.45);text-align:left"><b style="color:#f3bd4c">'+String(a.title).replace(/[&<>"]/g,'')+'</b><div style="font-size:12px;color:#e1e9f4;margin-top:3px">'+String(a.detail||'').replace(/[&<>"]/g,'')+'</div></div>').join('')+'</div>':'<p style="color:#dce5f1;font-size:13px">Your special certificate is being prepared. Thanks for playing!</p>';
   const old=document.getElementById('gameEndedOverlay');if(old)old.remove();
   const overlay=document.createElement('div');
   overlay.id='gameEndedOverlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:999999;background:linear-gradient(145deg,#17243b,#263d5e);display:flex;align-items:center;justify-content:center;padding:22px;color:#fff;text-align:center;font-family:inherit;';
-  overlay.innerHTML='<div style="max-width:560px;width:100%;padding:clamp(24px,5vw,48px);border:1px solid rgba(255,255,255,.18);border-radius:26px;background:rgba(255,255,255,.08);box-shadow:0 20px 70px rgba(0,0,0,.25)"><div style="font-size:clamp(42px,8vw,68px)">🏆🎉</div><div style="font-size:12px;letter-spacing:3px;font-weight:800;color:#f3bd4c;margin:12px 0">HARAPAN HIGH SQUAD</div><h1 style="font-size:clamp(28px,6vw,44px);line-height:1.1;margin:8px 0 14px">MISSION ACCOMPLISHED!</h1><p style="font-size:clamp(14px,2.5vw,17px);line-height:1.7;color:#e1e9f4;margin:0 0 10px">Congratulations, everyone! You\'ve completed your mission in Harapan High Squad.</p><p style="font-size:14px;line-height:1.7;color:#c8d5e7">Your teamwork, creativity, and determination made this adventure possible.</p><div style="margin-top:22px;font-size:15px;font-weight:800;color:#f3bd4c">GREAT JOB, '+String(me&&me.name||'STUDENT').replace(/[&<>"]/g,'')+'! 👏</div><div style="margin-top:25px;font-size:11px;color:#aebed2">Your progress has been saved. Please wait for your teacher’s next instruction.</div></div>';
+  overlay.innerHTML='<div style="max-width:560px;width:100%;padding:clamp(24px,5vw,48px);border:1px solid rgba(255,255,255,.18);border-radius:26px;background:rgba(255,255,255,.08);box-shadow:0 20px 70px rgba(0,0,0,.25)"><div style="font-size:clamp(42px,8vw,68px)">🏆🎉</div><div style="font-size:12px;letter-spacing:3px;font-weight:800;color:#f3bd4c;margin:12px 0">HARAPAN HIGH SQUAD</div><h1 style="font-size:clamp(28px,6vw,44px);line-height:1.1;margin:8px 0 14px">MISSION ACCOMPLISHED!</h1><p style="font-size:clamp(14px,2.5vw,17px);line-height:1.7;color:#e1e9f4;margin:0 0 10px">Congratulations, everyone! You\'ve completed your mission in Harapan High Squad.</p><p style="font-size:14px;line-height:1.7;color:#c8d5e7">Your teamwork, creativity, and determination made this adventure possible.</p><div style="margin-top:18px;padding:16px;border-radius:18px;background:rgba(255,255,255,.09);border:1px dashed rgba(243,189,76,.65)"><div style="font-size:10px;letter-spacing:2px;color:#f3bd4c;font-weight:800">SPECIAL CLASS AWARDS</div>'+awardHtml+'</div><div style="margin-top:22px;font-size:15px;font-weight:800;color:#f3bd4c">GREAT JOB, '+String(me&&me.name||'STUDENT').replace(/[&<>"]/g,'')+'! 👏</div><div style="margin-top:25px;font-size:11px;color:#aebed2">Your progress has been saved. Please wait for your teacher’s next instruction.</div></div>';
   document.body.appendChild(overlay);
   $('#game').classList.add('hide');
 }
@@ -764,8 +766,8 @@ $('#teacherKickClose').onclick=()=>{teacherControl.kicked=true;$('#teacherKick')
 
 function stealTo(id){if(!id||Date.now()<stealCd)return;stealCd=Date.now()+CONFIG.stealCooldown*1000;stealWait={to:id};Net.ev(id,{t:'steal',amt:CONFIG.stealAmt});toast('🦹 Sneaking up…');setTimeout(()=>{if(stealWait&&stealWait.to===id){stealWait=null;toast('Nothing happened…')}},7000)}
 function onEv(e){const who=(Net.peers[e.from]||{}).name||'Someone';
-  if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;ok=true;playSfx('steal');toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
-  else if(e.t==='res'&&stealWait&&stealWait.to===e.from){stealWait=null;if(e.ok){mo+=e.amt;toast(`🦹 You stole ${rp(e.amt)} from ${who}!`)}else{const l=Math.min(e.amt,mo);mo-=l;toast(`😬 ${who} had no money! You lost ${rp(l)}.`)}hud();persist()}}
+  if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;stealsReceived++;ok=true;playSfx('steal');toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
+  else if(e.t==='res'&&stealWait&&stealWait.to===e.from){stealWait=null;if(e.ok){mo+=e.amt;stealsMade++;toast(`🦹 You stole ${rp(e.amt)} from ${who}!`)}else{const l=Math.min(e.amt,mo);mo-=l;toast(`😬 ${who} had no money! You lost ${rp(l)}.`)}hud();persist()}}
 const FOOD=[{n:'Es Teh',ic:'🧋',p:3000,e:10},{n:'Cimol Bojot',ic:'🍢',p:5000,e:25},{n:'Bakso',ic:'🍜',p:8000,e:45},{n:'Nasi Uduk Komplit',ic:'🍛',p:12000,e:80}];
 const hidePress=()=>{clearTimeout(pressT);$('#press').classList.add('hide')};
 function schedRep(first){clearTimeout(repT);const[a,b]=CONFIG.reporterEvery;repT=setTimeout(()=>{if(REP.some(q=>!ru[q.id])){$('#press').classList.remove('hide');clearTimeout(pressT);pressT=setTimeout(hidePress,120000)}schedRep(false)},first?60000:(a+Math.random()*(b-a))*60000)}
@@ -781,7 +783,7 @@ function shop(msg){
   open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n} · Food Stall</b>${msg||'Hungry? Eat up to get your energy back!'}<br>🔋 ${en}/${CONFIG.energyMax} · 💰 ${rp(mo)}</div></div>`+FOOD.map((f,i)=>`<button class="opt" data-f="${i}"><i>${f.ic}</i><span>${f.n} · +${f.e} 🔋</span><b style="margin-left:auto">${rp(f.p)}</b></button>`).join('')+`<div class="row" style="margin-top:12px"><button class="btn gr" id="later">Close</button></div>`);
   $('#later').onclick=close;document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=FOOD[+b.dataset.f];
     if(en>=CONFIG.energyMax)return shop('Your energy is already full! 💪');if(mo<f.p)return shop('Not enough money 😅 Answer the reporter\'s questions to earn more!');
-    mo-=f.p;en=Math.min(CONFIG.energyMax,en+f.e);hud();persist();shop(`Yum! ${f.ic} ${f.n}: +${f.e} 🔋`)})}
+    mo-=f.p;snackCount++;en=Math.min(CONFIG.energyMax,en+f.e);hud();persist();shop(`Yum! ${f.ic} ${f.n}: +${f.e} 🔋`)})}
 const clueNow=()=>{const n=Object.keys(done).length;return ROLES[me.rl].clues[n<3?0:n<6?1:2]};
 
 /* ---------- Networking: local tabs or Firebase REST ---------- */
@@ -850,7 +852,7 @@ function frame(t){
   // prompt
   const nb=nearNPC();const tb=$('#talkbtn');if(nb&&$('#modal').classList.contains('hide')){tb.classList.remove('hide');tb.textContent=`💬 Talk to ${nb.npc.n}`;tb.dataset.b=nb.id}else tb.classList.add('hide');
   // network tick
-  if(t-lastSend>250){lastSend=t;if(!teacherControl.kicked)Net.send({id:me.id,name:me.name,av:me.av,x:Math.round(me.x),y:Math.round(me.y),xp,done:Object.keys(done).length,sch:me.sch,rl:me.rl,status:Object.keys(done).length===BLD.length?'completed':'playing',ts:Date.now()+Math.random()})}
+  if(t-lastSend>250){lastSend=t;if(!teacherControl.kicked)Net.send({id:me.id,name:me.name,av:me.av,x:Math.round(me.x),y:Math.round(me.y),xp,done:Object.keys(done).length,sch:me.sch,rl:me.rl,status:Object.keys(done).length===BLD.length?'completed':'playing',correct,asked,money:mo,snackCount,stealsMade,stealsReceived,ts:Date.now()+Math.random()})}
   $('#np').textContent=1+real.length+(showBots?bots.length:0);
   requestAnimationFrame(frame);
 }
@@ -982,7 +984,7 @@ async function startGame(){
   SCH=SCHOOLS[a.sch];
   me={id:saved?saved.id:'p'+Math.random().toString(36).slice(2,9),name,room,joinedAt:Date.now(),av:saved?saved.av:selAv,sch:a.sch,rl:a.rl,x:380+Math.random()*50,y:222+Math.random()*20,f:1,tx:null,share:false};
   const r=ROLES[me.rl];
-  if(saved){done=saved.done||{};xp=saved.xp||0;gems=saved.gems||0;streak=saved.streak||0;correct=saved.correct||0;asked=saved.asked||0;sv={res:saved.res||{},cur:saved.cur||null};en=saved.en!=null?saved.en:CONFIG.energyMax;mo=saved.mo||0;ru=saved.ru||{};if(saved.rcur){ru[saved.rcur]=1;lockedMsg=true}
+  if(saved){done=saved.done||{};xp=saved.xp||0;gems=saved.gems||0;streak=saved.streak||0;correct=saved.correct||0;asked=saved.asked||0;sv={res:saved.res||{},cur:saved.cur||null};en=saved.en!=null?saved.en:CONFIG.energyMax;mo=saved.mo||0;snackCount=saved.snackCount||0;stealsMade=saved.stealsMade||0;stealsReceived=saved.stealsReceived||0;ru=saved.ru||{};if(saved.rcur){ru[saved.rcur]=1;lockedMsg=true}
     
     if(sv.cur){const c=sv.cur;(sv.res[c.b]=sv.res[c.b]||{})[c.i]=0;asked++;streak=0;en=Math.max(0,en-CONFIG.wrongCost);sv.cur=null;lockedMsg=true}
     BLD.forEach((b,i)=>{const q=sv.res[b.id];if(q&&Object.keys(q).length>=QN[i]&&!done[b.id]){done[b.id]=1;xp+=Object.values(q).every(v=>v===1)?20:5}})}
