@@ -89,12 +89,16 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
   </section>
   <section class="panel" id="broadcast" style="margin-bottom:17px">
     <div class="panel-head"><div><h2>Broadcast Center</h2><div class="sub">Global announcement composer · all rooms</div></div><span class="tag">ALL ROOMS</span></div>
-    <div class="control-grid">
-      <div class="control-card"><div class="ico">📣</div><b>Normal Announcement</b><p>Send a regular classroom reminder to all players.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
-      <div class="control-card"><div class="ico">⚠️</div><b>Important Message</b><p>Display a priority popup that students must acknowledge.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
-      <div class="control-card"><div class="ico">🚨</div><b>Emergency Broadcast</b><p>Urgent announcement with a pause-style attention screen.</p><button disabled>LOCKED · AUTH REQUIRED</button></div>
+    <div style="padding:18px 20px">
+      <label for="broadcastMessage" style="display:block;font-weight:800;font-size:12px;margin-bottom:8px">Message to all rooms</label>
+      <textarea id="broadcastMessage" maxlength="500" rows="4" placeholder="Write an announcement for your students…" style="width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;font:inherit;resize:vertical"></textarea>
+      <div style="display:flex;justify-content:space-between;gap:10px;margin:8px 0 15px;color:var(--muted);font-size:11px"><span id="broadcastStatus" role="status">Sign in as teacher to send announcements.</span><span id="broadcastCount">0 / 500</span></div>
+      <div class="control-grid">
+        <div class="control-card"><div class="ico">📣</div><b>Normal Announcement</b><p>Regular classroom reminder to every room.</p><button class="broadcast-send" data-broadcast-type="normal" disabled>SEND NORMAL</button></div>
+        <div class="control-card"><div class="ico">⚠️</div><b>Important Message</b><p>Priority popup for students to acknowledge.</p><button class="broadcast-send" data-broadcast-type="important" disabled>SEND IMPORTANT</button></div>
+        <div class="control-card"><div class="ico">🚨</div><b>Emergency Broadcast</b><p>Urgent popup for immediate attention.</p><button class="broadcast-send" data-broadcast-type="emergency" disabled>SEND EMERGENCY</button></div>
+      </div>
     </div>
-    <div class="locked">Broadcast delivery is prepared on the student side. Sending is disabled until secure teacher write permissions are configured.</div>
   </section>
 
   <section class="panel endgame-panel" id="endgame" style="margin-bottom:17px">
@@ -223,6 +227,26 @@ async function deleteRoom(room){
  }catch(e){alert('Could not delete room: '+e.message)}
 }
 
+$('broadcastMessage').addEventListener('input',()=>{$('broadcastCount').textContent=$('broadcastMessage').value.length+' / 500';});
+document.querySelectorAll('.broadcast-send').forEach(button=>button.addEventListener('click',async()=>{
+ if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)return alert('Teacher sign-in and secure Firebase Rules are required.');
+ const message=$('broadcastMessage').value.trim();
+ if(!message)return alert('Write your announcement first.');
+ const type=button.dataset.broadcastType;
+ if(!confirm('Send '+type.toUpperCase()+' announcement to ALL rooms?'))return;
+ const buttons=document.querySelectorAll('.broadcast-send');
+ buttons.forEach(b=>b.disabled=true);
+ $('broadcastStatus').textContent='Sending announcement…';
+ try{
+  const token=await teacherUser.getIdToken(true),now=Date.now();
+  const payload={id:'broadcast-'+now+'-'+Math.random().toString(36).slice(2,9),type,message,createdAt:now,expiresAt:now+5*60*1000,createdBy:teacherUser.uid};
+  const response=await fetch(DB+'/teacher_control/broadcast.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!response.ok)throw new Error('Firebase returned '+response.status);
+  $('broadcastStatus').textContent='✓ '+type.toUpperCase()+' broadcast sent to all connected rooms.';
+  $('broadcastMessage').value='';$('broadcastCount').textContent='0 / 500';
+ }catch(e){$('broadcastStatus').textContent='Could not send: '+e.message;}
+ finally{buttons.forEach(b=>b.disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady));}
+}));
 function setTeacherAuthUI(message){
   $('teacherAuthStatus').textContent=message;
   $('teacherLogin').style.display=teacherUser?'none':'block';
@@ -231,6 +255,7 @@ function setTeacherAuthUI(message){
   $('teacherPassword').style.display=teacherUser?'none':'block';
   $('endGameBtn').disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady);
   $('startSessionBtn').disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady);
+  document.querySelectorAll('.broadcast-send').forEach(b=>b.disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady));
   $('startSessionBtn').textContent=$('startSessionBtn').disabled?'🔒 SIGN IN TO START NEW SESSION':'🟢 START NEW SESSION';
   $('endGameBtn').textContent=$('endGameBtn').disabled?'🔒 WAITING FOR DATABASE RULES':'🏁 END GAME FOR EVERYONE';
 }
