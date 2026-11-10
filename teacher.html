@@ -24,7 +24,7 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
 .room-map .road{fill:#f0d9a4}.room-map .building{fill:#e8b85d;stroke:#725c40;stroke-width:3}.room-map .player{stroke:#fff;stroke-width:3}.room-map .player-label{font-size:20px;font-weight:bold;fill:#24344a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 .activity{display:grid;gap:12px}.activity-item{display:flex;gap:10px;align-items:flex-start}.activity-ico{width:30px;height:30px;border-radius:9px;background:#eef3fa;display:grid;place-items:center;flex:none}.activity-item b{font-size:11px;display:block}.activity-item small{color:var(--muted);font-size:10px}
 .toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:13px}.search{min-width:190px;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;outline:0;font-size:12px}.filter{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);font-size:12px}
-.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#8290a2;font-size:10px;letter-spacing:.7px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:11px}.row-action{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:800}.room-delete{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}tbody tr:last-child td{border-bottom:0}.student{display:flex;align-items:center;gap:9px;font-weight:700}.avatar{width:30px;height:30px;border-radius:10px;background:#eaf0fa;display:grid;place-items:center}.status{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}.status.online{background:#e7f7ee;color:#1b8056}.status.offline{background:#f0f2f5;color:#667085}.status.idle{background:#fff4df;color:#956816}.status.completed{background:#e9efff;color:#4665a7}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th{text-align:left;color:#8290a2;font-size:10px;letter-spacing:.7px;padding:10px;border-bottom:1px solid var(--line)}td{padding:12px 10px;border-bottom:1px solid #edf0f4;font-size:11px}.row-action{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:800}.room-stop{border:1px solid #f0d49b;background:#fff9e9;color:#956816;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}.room-delete{border:1px solid #e7b8b5;background:#fff7f6;color:#b64c47;border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}tbody tr:last-child td{border-bottom:0}.student{display:flex;align-items:center;gap:9px;font-weight:700}.avatar{width:30px;height:30px;border-radius:10px;background:#eaf0fa;display:grid;place-items:center}.status{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 8px;font-size:10px;font-weight:800}.status.online{background:#e7f7ee;color:#1b8056}.status.offline{background:#f0f2f5;color:#667085}.status.idle{background:#fff4df;color:#956816}.status.completed{background:#e9efff;color:#4665a7}
 .empty{padding:25px;text-align:center;color:var(--muted);font-size:12px}.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.control-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fafbfd}.control-card .ico{font-size:21px;margin-bottom:9px}.control-card b{display:block;font-size:12px}.control-card p{font-size:10px;color:var(--muted);line-height:1.5;min-height:31px}.control-card button{width:100%;padding:9px;border-radius:9px;background:#e9edf3;color:#8792a1;font-size:10px;font-weight:800;cursor:not-allowed}.locked{font-size:10px;color:#a56b20;margin-top:10px}
 .footer{text-align:center;color:#9aa5b4;font-size:10px;margin-top:20px}
 @media(max-width:1050px){.shell{grid-template-columns:205px 1fr}.content-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
@@ -175,7 +175,7 @@ function paint(data){
  var online=all.filter(function(p){return state(p)==='online'}).length;
  $('total').textContent=all.length;$('online').textContent=online;$('rooms').textContent=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0}).length;$('completed').textContent=all.filter(function(p){return state(p)==='completed'}).length;
  var validRooms=roomNames.filter(function(r){return Object.keys(data[r]||{}).length>0});
- $('roomMaps').innerHTML=validRooms.length?validRooms.map(function(room){var people=all.filter(function(p){return p.room===room});var live=people.filter(function(p){return state(p)==='online'}).length;return '<div class="room-card"><div class="room-head"><div><b>'+esc(room)+'</b><br><small>'+people.length+' player record(s)</small></div><span class="status '+(live?'online':'offline')+'">'+live+' ONLINE</span></div>'+roomMap(room,people)+'<div class="room-foot"><span>'+people.filter(function(p){return state(p)==='completed'}).length+' completed</span><span>'+people.filter(function(p){return state(p)==='offline'}).length+' offline</span><button class="room-delete" data-delete-room="'+encodeURIComponent(room)+'">DELETE ROOM</button></div></div>'}).join(''):'<div class="empty">No room data found yet. Students appear after entering the game world.</div>';
+ $('roomMaps').innerHTML=validRooms.length?validRooms.map(function(room){var people=all.filter(function(p){return p.room===room});var live=people.filter(function(p){return state(p)==='online'}).length;return '<div class="room-card"><div class="room-head"><div><b>'+esc(room)+'</b><br><small>'+people.length+' player record(s)</small></div><span class="status '+(live?'online':'offline')+'">'+live+' ONLINE</span></div>'+roomMap(room,people)+'<div class="room-foot"><span>'+people.filter(function(p){return state(p)==='completed'}).length+' completed</span><span>'+people.filter(function(p){return state(p)==='offline'}).length+' offline</span><button class="room-stop" data-stop-room="'+encodeURIComponent(room)+'">⏹ STOP SESSION</button><button class="room-delete" data-delete-room="'+encodeURIComponent(room)+'">DELETE ROOM</button></div></div>'}).join(''):'<div class="empty">No room data found yet. Students appear after entering the game world.</div>';
  var options='<option value="">All rooms</option>'+validRooms.map(function(r){return '<option value="'+esc(r)+'">'+esc(r)+'</option>'}).join('');
  var old=$('roomFilter').value;$('roomFilter').innerHTML=options;if(validRooms.indexOf(old)>=0)$('roomFilter').value=old;
  var newest=all.slice().sort(function(a,b){return Number(b.ts||0)-Number(a.ts||0)}).slice(0,6);
@@ -213,6 +213,38 @@ async function removeStudent(room,id){
   $('teacherAuthStatus').textContent=(p.name||id)+' removed from '+room+'.';
   await load();
  }catch(e){alert('Could not remove student: '+e.message)}
+}
+async function endRoomSession(room){
+ if(!teacherUser||!teacherRulesReady)return alert('Please sign in as the authorized teacher first.');
+ const people=latest.filter(p=>p.room===room);
+ if(!people.length)return alert('No student records found in '+room+'.');
+ if(!confirm('Stop the game session in '+room+' only? Students in other rooms will continue playing.'))return;
+ try{
+  const token=await teacherUser.getIdToken(true);
+  const rosterRes=await fetch(DB+'/hh/'+encodeURIComponent(room)+'.json',{cache:'no-store'});
+  if(!rosterRes.ok)throw new Error('Could not read room stats ('+rosterRes.status+')');
+  const roster=await rosterRes.json()||{},players=Object.keys(roster).map(id=>({...roster[id],id,room})).filter(p=>p&&p.id);
+  const awards={};
+  const categories=[
+   {key:'correct',title:'🧠 Grammar Genius',detail:v=>v+' correct answers'},
+   {key:'wrong',title:'🤪 Typo & Trap Survivor',detail:v=>v+' wrong answers faced'},
+   {key:'snackCount',title:'🍜 Canteen VIP',detail:v=>v+' snack purchases'},
+   {key:'stealsMade',title:'🦹 Master Pickpocket',detail:v=>v+' successful steals'},
+   {key:'stealsReceived',title:'🛡️ Most Wanted Wallet',detail:v=>v+' times robbed'},
+   {key:'xp',title:'⚡ XP Superstar',detail:v=>v+' XP earned'}
+  ];
+  categories.forEach(cat=>{
+   const vals=players.map(p=>cat.key==='wrong'?Math.max(0,Number(p.asked||0)-Number(p.correct||0)):Number(p[cat.key]||0));
+   if(!vals.length)return;const max=Math.max(...vals);if(max<=0)return;
+   players.forEach((p,i)=>{if(vals[i]===max)(awards[p.id]||(awards[p.id]=[])).push({title:cat.title,detail:cat.detail(max)});});
+  });
+  const rich=players.filter(p=>Number(p.money||0)>0),maxMoney=rich.length?Math.max(...rich.map(p=>Number(p.money||0))):0;
+  rich.filter(p=>Number(p.money||0)===maxMoney).forEach(p=>(awards[p.id]||(awards[p.id]=[])).push({title:'💰 Sultan of the School',detail:'Finished with Rp'+Number(p.money).toLocaleString('id-ID')+' in the pocket'}));
+  const payload={status:'ended',endedAt:Date.now(),message:'MISSION ACCOMPLISHED!',room,awards};
+  const response=await fetch(DB+'/teacher_control/rooms/'+encodeURIComponent(room)+'/session.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(!response.ok)throw new Error('Firebase rejected room session command ('+response.status+')');
+  $('teacherAuthStatus').textContent='Session stopped for '+room+'. Other rooms remain active.';
+ }catch(e){alert('Could not stop room session: '+e.message)}
 }
 async function deleteRoom(room){
  if(!teacherUser||!teacherRulesReady)return alert('Please sign in as the authorized teacher first.');
@@ -343,7 +375,7 @@ $('endGameBtn').addEventListener('click',async()=>{
 initTeacherAuth();
 
 $('studentRows').addEventListener('click',function(e){const b=e.target.closest('[data-remove]');if(!b)return;const parts=b.dataset.remove.split('|');removeStudent(decodeURIComponent(parts[0]),decodeURIComponent(parts[1]));});
-$('roomMaps').addEventListener('click',function(e){const b=e.target.closest('[data-delete-room]');if(b)deleteRoom(decodeURIComponent(b.dataset.deleteRoom));});
+$('roomMaps').addEventListener('click',function(e){const stop=e.target.closest('[data-stop-room]');if(stop){endRoomSession(decodeURIComponent(stop.dataset.stopRoom));return;}const b=e.target.closest('[data-delete-room]');if(b)deleteRoom(decodeURIComponent(b.dataset.deleteRoom));});
 $('refresh').addEventListener('click',load);
 $('search').addEventListener('input',render);$('roomFilter').addEventListener('change',render);$('statusFilter').addEventListener('change',render);
 load();setInterval(load,3000);
