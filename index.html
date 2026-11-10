@@ -890,8 +890,21 @@ function showQ(){
 function finishB(){
   done[cur.id]=1;xp+=right===qs.length?20:5;hud();sv.cur=null;persist();sendScore(Object.keys(done).length===BLD.length?'complete':'progress');$('#ok-'+cur.id).setAttribute('opacity','1');const m=ents['npc-'+cur.id];if(m){const mk=m.g.querySelector('.npcm');if(mk)mk.remove()}
   const n=Object.keys(done).length;
-  if(n===BLD.length)return finale();
+  if(n===BLD.length){
+    const accuracy=asked?Math.round(correct/asked*100):0;
+    sendScore(accuracy<60?'transferred':'complete');
+    if(accuracy<60)return transferSchool(accuracy);
+    return finale();
+  }
   open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n}</b>${right===qs.length?'Perfect! 🌟 Bonus XP for you!':'Nice effort! Keep going.'}<br>You got <b>${right}/${qs.length}</b>. Missions: <b>${n}/${BLD.length}</b>.</div></div><div class="row" style="margin-top:14px"><button class="btn" id="ok">Continue</button></div>`);$('#ok').onclick=close;
+}
+function transferSchool(accuracy){
+  const previous=SCH.name,nextIndex=(me.sch+1)%SCHOOLS.length,next=SCHOOLS[nextIndex];
+  open(`<div style="text-align:center;padding:8px 2px"><div style="font-size:58px">📦🏫</div><h2 style="margin:4px 0;color:#d65b4b">Oops! You're transferred!</h2><p style="font-weight:700">Dear ${me.name.replace(/[&<>"']/g,'')},</p><p>It looks like your answers and this school are having a little disagreement. 😅</p><p>You completed all 9 quests at <b>${previous}</b>, but your accuracy was <b>${accuracy}%</b>.</p><p>So… the school administration has decided to transfer you to <b>${next.name}</b> for a fresh start!</p><div class="item" style="text-align:left;margin:12px 0">🌟 Don't be sad! New school, new friends, new chances. Keep learning, trust yourself, and hopefully fewer plot twists in your answers next time. Good luck at your new school! 💪</div><p style="font-size:12px;color:#718096">This is just a playful game event. Your XP, money, gems, and role will stay with you.</p><button class="btn y" id="acceptTransfer" style="width:100%">🚍 Off to my new school!</button></div>`);
+  $('#acceptTransfer').onclick=()=>{
+    me.sch=nextIndex;SCH=next;done={};sv={res:{},cur:null};correct=0;asked=0;right=0;qi=0;cur=null;
+    persist();location.reload();
+  };
 }
 function finale(){
   const acc=asked?Math.round(correct/asked*100):0;
