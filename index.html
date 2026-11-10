@@ -741,13 +741,16 @@ async function pollTeacherControls(){
   if(!me||!Net.url||Net.mode!=='cloud'||teacherControl.ended)return;
   try{
     const base=Net.url+'/teacher_control';
-    const [sessionRes,broadcastRes,kickRes]=await Promise.all([
+    const [sessionRes,broadcastRes,kickRes,roomSessionRes]=await Promise.all([
       fetch(base+'/session.json'),fetch(base+'/broadcast.json'),
-      fetch(base+'/moderation/'+encodeURIComponent(me.id)+'.json')
+      fetch(base+'/moderation/'+encodeURIComponent(me.id)+'.json'),
+      fetch(base+'/rooms/'+encodeURIComponent(me.room)+'/session.json')
     ]);
     const session=await sessionRes.json();
+    const roomSession=await roomSessionRes.json();
     const broadcast=await broadcastRes.json();
     const kick=await kickRes.json();
+    if(roomSession&&roomSession.status==='ended'){showGameEnded(roomSession);return;}
     if(session&&session.status==='ended'){showGameEnded(session);return;}
     teacherControl.paused=!!(session&&session.status==='paused');
     if(broadcast&&broadcast.id&&broadcast.id!==teacherControl.lastBroadcast){
