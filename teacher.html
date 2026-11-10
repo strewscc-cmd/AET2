@@ -35,7 +35,7 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
 .endgame-action{border:1px solid #f1d5d2;border-radius:14px;padding:16px;background:#fff}
 .endgame-action h3{font:700 15px "Space Grotesk";margin:0 0 7px}
 .endgame-action p{font-size:11px;line-height:1.55;color:var(--muted)}
-.end-btn{width:100%;padding:12px;border-radius:10px;background:#f4e5e4;color:#a75a55;font-weight:800;font-size:11px;cursor:not-allowed}
+.end-btn{width:100%;padding:12px;border-radius:10px;background:#f4e5e4;color:#a75a55;font-weight:800;font-size:11px;cursor:not-allowed}.start-btn{width:100%;padding:12px;border-radius:10px;background:#e5f6ed;color:#16764d;font-weight:800;font-size:11px;margin:0 0 9px;cursor:pointer}.start-btn:disabled{background:#edf0f4;color:#8994a5;cursor:not-allowed}
 .congrats-preview{border-radius:14px;background:#17243b;color:#fff;padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:210px}
 .congrats-preview .trophy{font-size:34px}
 .congrats-preview h3{font:700 21px "Space Grotesk";margin:8px 0}
@@ -109,6 +109,11 @@ main{min-width:0;padding:28px clamp(16px,3vw,38px) 45px}
         <div id="teacherAuthStatus" class="endgame-note">Not signed in. Credentials are sent directly to Firebase Authentication, not stored in this page.</div>
         <button id="teacherLogout" class="refresh" style="width:100%;margin-top:8px;display:none">Sign out</button>
         <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
+        <h3>Start a New Session</h3>
+        <p>Open a fresh classroom session after the previous game has ended. This does not erase student scores or saved progress.</p>
+        <button id="startSessionBtn" class="start-btn" disabled>🔒 SIGN IN TO START NEW SESSION</button>
+        <div class="endgame-note" style="margin:0 0 15px">Students who are still on the previous congratulations screen must refresh the game page before joining again.</div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
         <h3>End the Game for Everyone</h3>
         <p>Once signed in and authorized, this sends a session-ending signal to every connected student.</p>
         <button id="endGameBtn" class="end-btn" disabled>🔒 SIGN IN TO END GAME</button>
@@ -190,6 +195,8 @@ function setTeacherAuthUI(message){
   $('teacherEmail').style.display=teacherUser?'none':'block';
   $('teacherPassword').style.display=teacherUser?'none':'block';
   $('endGameBtn').disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady);
+  $('startSessionBtn').disabled=!(teacherUser&&teacherUser.uid===TEACHER_UID&&teacherRulesReady);
+  $('startSessionBtn').textContent=$('startSessionBtn').disabled?'🔒 SIGN IN TO START NEW SESSION':'🟢 START NEW SESSION';
   $('endGameBtn').textContent=$('endGameBtn').disabled?'🔒 WAITING FOR DATABASE RULES':'🏁 END GAME FOR EVERYONE';
 }
 async function initTeacherAuth(){
@@ -226,6 +233,18 @@ $('teacherLogin').addEventListener('click',async()=>{
   finally{$('teacherLogin').disabled=false}
 });
 $('teacherLogout').addEventListener('click',()=>teacherAuth&&teacherAuth.signOut());
+$('startSessionBtn').addEventListener('click',async()=>{
+  if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)return;
+  if(!confirm('Open a NEW session for everyone? Students who saw the previous end screen must refresh the game page. Existing scores and progress will not be erased.'))return;
+  const token=await teacherUser.getIdToken(true);
+  const now=Date.now();
+  const response=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'active',sessionId:'session-'+now,startedAt:now,startedBy:teacherUser.uid})});
+  if(!response.ok){$('teacherAuthStatus').textContent='Could not start a new session. Check Firebase Rules and teacher authorization.';return}
+  $('startSessionBtn').textContent='✓ NEW SESSION OPEN';
+  $('endGameBtn').disabled=false;
+  $('endGameBtn').textContent='🏁 END GAME FOR EVERYONE';
+  $('teacherAuthStatus').textContent='New session opened. Ask students on the previous congratulations screen to refresh the game page.';
+});
 $('endGameBtn').addEventListener('click',async()=>{
   if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)return;
   if(!confirm('End the game for ALL connected students in every room? This will show the congratulations screen.'))return;
