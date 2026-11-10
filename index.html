@@ -850,7 +850,7 @@ function frame(t){
   // prompt
   const nb=nearNPC();const tb=$('#talkbtn');if(nb&&$('#modal').classList.contains('hide')){tb.classList.remove('hide');tb.textContent=`💬 Talk to ${nb.npc.n}`;tb.dataset.b=nb.id}else tb.classList.add('hide');
   // network tick
-  if(t-lastSend>250){lastSend=t;Net.send({id:me.id,name:me.name,av:me.av,x:Math.round(me.x),y:Math.round(me.y),xp,done:Object.keys(done).length,sch:me.sch,rl:me.rl,status:Object.keys(done).length===BLD.length?'completed':'playing',ts:Date.now()+Math.random()})}
+  if(t-lastSend>250){lastSend=t;if(!teacherControl.kicked)Net.send({id:me.id,name:me.name,av:me.av,x:Math.round(me.x),y:Math.round(me.y),xp,done:Object.keys(done).length,sch:me.sch,rl:me.rl,status:Object.keys(done).length===BLD.length?'completed':'playing',ts:Date.now()+Math.random()})}
   $('#np').textContent=1+real.length+(showBots?bots.length:0);
   requestAnimationFrame(frame);
 }
