@@ -309,7 +309,32 @@ $('endGameBtn').addEventListener('click',async()=>{
   if(!teacherUser||teacherUser.uid!==TEACHER_UID||!teacherRulesReady)return;
   if(!confirm('End the game for ALL connected students in every room? This will show the congratulations screen.'))return;
   const token=await teacherUser.getIdToken(true);
-  const response=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'ended',endedAt:Date.now(),message:'MISSION ACCOMPLISHED!'} )});
+  $('endGameBtn').disabled=true;$('teacherAuthStatus').textContent='Collecting class stats and preparing certificates…';
+  let awards={};
+  try{
+    const rosterRes=await fetch(DB+'/hh.json',{cache:'no-store'});
+    if(!rosterRes.ok)throw new Error('Could not read player stats ('+rosterRes.status+')');
+    const roster=await rosterRes.json()||{},players=[];
+    Object.keys(roster).forEach(room=>Object.keys(roster[room]||{}).forEach(id=>{
+      const p=roster[room][id];if(p&&p.id)players.push({...p,id,room});
+    }));
+    const categories=[
+      {key:'correct',title:'🧠 Grammar Genius',detail:v=>v+' correct answers'},
+      {key:'wrong',title:'🤪 Typo & Trap Survivor',detail:v=>v+' wrong answers faced'},
+      {key:'snackCount',title:'🍜 Canteen VIP',detail:v=>v+' snack purchases'},
+      {key:'stealsMade',title:'🦹 Master Pickpocket',detail:v=>v+' successful steals'},
+      {key:'stealsReceived',title:'🛡️ Most Wanted Wallet',detail:v=>v+' times robbed'},
+      {key:'xp',title:'⚡ XP Superstar',detail:v=>v+' XP earned'}
+    ];
+    categories.forEach(cat=>{
+      const values=players.map(p=>cat.key==='wrong'?Math.max(0,Number(p.asked||0)-Number(p.correct||0)):Number(p[cat.key]||0));
+      if(!values.length)return;const max=Math.max(...values);if(max<=0)return;
+      players.forEach((p,i)=>{if(values[i]===max){(awards[p.id]||(awards[p.id]=[])).push({title:cat.title,detail:cat.detail(max)+' · '+(p.room||'')});}});
+    });
+    const rich=players.filter(p=>Number(p.money||0)>0),maxMoney=rich.length?Math.max(...rich.map(p=>Number(p.money||0))):0;
+    rich.filter(p=>Number(p.money||0)===maxMoney).forEach(p=>(awards[p.id]||(awards[p.id]=[])).push({title:'💰 Sultan of the School',detail:'Finished with Rp'+Number(p.money).toLocaleString('id-ID')+' in the pocket'}));
+  }catch(e){$('teacherAuthStatus').textContent='Certificate stats unavailable: '+e.message+' · Ending session without awards.';awards={};}
+  const response=await fetch(DB+'/teacher_control/session.json?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'ended',endedAt:Date.now(),message:'MISSION ACCOMPLISHED!',awards})});
   if(!response.ok){setTeacherAuthUI('Could not end the game. Check Firebase Rules and teacher authorization.');return}
   $('endGameBtn').textContent='✓ GAME ENDED';
   $('endGameBtn').disabled=true;
