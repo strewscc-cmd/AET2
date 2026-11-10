@@ -888,7 +888,7 @@ function showQ(){
   });
 }
 function finishB(){
-  done[cur.id]=1;xp+=right===qs.length?20:5;hud();sv.cur=null;persist();sendScore(Object.keys(done).length===BLD.length?'complete':'progress');$('#ok-'+cur.id).setAttribute('opacity','1');const m=ents['npc-'+cur.id];if(m){const mk=m.g.querySelector('.npcm');if(mk)mk.remove()}
+  done[cur.id]=1;xp+=right===qs.length?20:5;hud();sv.cur=null;persist();sendScore('progress');$('#ok-'+cur.id).setAttribute('opacity','1');const m=ents['npc-'+cur.id];if(m){const mk=m.g.querySelector('.npcm');if(mk)mk.remove()}
   const n=Object.keys(done).length;
   if(n===BLD.length){
     const accuracy=asked?Math.round(correct/asked*100):0;
