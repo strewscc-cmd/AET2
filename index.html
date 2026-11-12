@@ -775,11 +775,11 @@ async function pollTeacherControls(){
 $('#teacherNoticeClose').onclick=()=>$('#teacherNotice').classList.add('hide');
 $('#teacherKickClose').onclick=()=>{teacherControl.kicked=true;$('#teacherKick').classList.remove('hide');$('#game').classList.add('hide');$('#join').classList.remove('hide');$('#go').disabled=true;$('#go').textContent='Room access restricted';};
 
-function stealTo(id){if(!id||Date.now()<stealCd)return;stealCd=Date.now()+CONFIG.stealCooldown*1000;stealWait={to:id};Net.ev(id,{t:'steal',amt:CONFIG.stealAmt});toast('🦹 Sneaking up…');setTimeout(()=>{if(stealWait&&stealWait.to===id){stealWait=null;toast('Nothing happened…')}},7000)}
+function stealTo(id){if(!id||Date.now()<stealCd)return;hhsDefenseGate(()=>{stealCd=Date.now()+CONFIG.stealCooldown*1000;stealWait={to:id};Net.ev(id,{t:'steal',amt:CONFIG.stealAmt});toast('🦹 Sneaking up…');setTimeout(()=>{if(stealWait&&stealWait.to===id){stealWait=null;toast('Nothing happened…')}},7000)})}
 function onEv(e){const who=(Net.peers[e.from]||{}).name||'Someone';
   if(e.t==='steal'){let ok=false,amt=Math.min(e.amt,mo);if(mo>0){mo-=amt;stealsReceived++;ok=true;playSfx('steal');toast(`🦹 ${who} stole ${rp(amt)} from you!`)}else toast(`😏 ${who} tried to steal, but your pocket was empty!`);hud();persist();Net.ev(e.from,{t:'res',ok,amt:ok?amt:e.amt})}
   else if(e.t==='res'&&stealWait&&stealWait.to===e.from){stealWait=null;if(e.ok){mo+=e.amt;stealsMade++;toast(`🦹 You stole ${rp(e.amt)} from ${who}!`)}else{const l=Math.min(e.amt,mo);mo-=l;toast(`😬 ${who} had no money! You lost ${rp(l)}.`)}hud();persist()}}
-const FOOD=[{n:'Es Teh',ic:'🧋',p:3000,e:10},{n:'Cimol Bojot',ic:'🍢',p:5000,e:25},{n:'Bakso',ic:'🍜',p:8000,e:45},{n:'Nasi Uduk Komplit',ic:'🍛',p:12000,e:80}];
+const FOOD=[{n:'Es Teh',ic:'🧋',p:3000,e:10},{n:'Cimol Bojot',ic:'🍢',p:5000,e:25},{n:'Bakso',ic:'🍜',p:8000,e:45},{n:'Nasi Uduk Komplit',ic:'🍛',p:12000,e:80},{n:'Mie Jebew',ic:'🌶️',p:10000,e:35},{n:'Matcha Latte',ic:'🍵',p:12000,e:25},{n:'Brown Sugar Boba',ic:'🧋',p:12000,e:25},{n:'Nasi Goreng',ic:'🍳',p:15000,e:55},{n:'Cireng',ic:'🥟',p:5000,e:15},{n:'Ayam Geprek',ic:'🍗',p:18000,e:65}];
 const hidePress=()=>{clearTimeout(pressT);$('#press').classList.add('hide')};
 function schedRep(first){clearTimeout(repT);const[a,b]=CONFIG.reporterEvery;repT=setTimeout(()=>{if(REP.some(q=>!ru[q.id])){$('#press').classList.remove('hide');clearTimeout(pressT);pressT=setTimeout(hidePress,120000)}schedRep(false)},first?60000:(a+Math.random()*(b-a))*60000)}
 function reporterAsk(){
@@ -789,6 +789,58 @@ function reporterAsk(){
   document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.i];document.querySelectorAll('.opt').forEach(x=>x.disabled=true);ru[q.id]=1;rcur=null;
     if(o.ok){playSfx('correct');b.classList.add('ok');mo+=CONFIG.reward;xp+=5}else{playSfx('wrong');b.classList.add('no')}hud();persist();
     $('#fbx').innerHTML=`<div class="fb pop">${o.ok?'✅ Correct! 💰 +'+rp(CONFIG.reward)+'. '+q.fb:'❌ Not quite. No reward, and this question is now locked.'}</div><div style="margin-top:12px"><button class="btn y" id="ok">Close</button></div>`;$('#ok').onclick=close})}
+
+/* ---------- HHS Add-on: classroom side challenges ---------- */
+const HHS_FALLACIES=[
+ {claim:'“Everyone in our class uses this app, so it must be the best learning app.”',q:'What is the main logical fallacy?',opts:['Bandwagon','False cause','Ad hominem','Slippery slope'],a:0,fb:'Bandwagon: popularity is treated as proof of quality.'},
+ {claim:'“You cannot trust Raka’s argument about recycling because he failed a science test.”',q:'What is the main logical fallacy?',opts:['Hasty generalisation','Ad hominem','False dilemma','Appeal to authority'],a:1,fb:'Ad hominem attacks the person instead of addressing the argument.'},
+ {claim:'“If we allow phones for one lesson, soon nobody will study and the school will collapse.”',q:'What is the main logical fallacy?',opts:['Slippery slope','Bandwagon','Circular reasoning','Red herring'],a:0,fb:'Slippery slope assumes an extreme chain of consequences without enough evidence.'},
+ {claim:'“Two students disliked the new lunch menu, so the entire school hates it.”',q:'What is the main logical fallacy?',opts:['False analogy','Hasty generalisation','Ad hominem','Post hoc'],a:1,fb:'A very small sample is used to make a broad conclusion.'},
+ {claim:'“Either the school bans every phone completely or students will never learn discipline.”',q:'What is the main logical fallacy?',opts:['False dilemma','Appeal to nature','Bandwagon','Red herring'],a:0,fb:'False dilemma presents only two choices when more options exist.'},
+ {claim:'“The rule is fair because it is a fair rule.”',q:'What is the main logical fallacy?',opts:['Circular reasoning','False cause','Slippery slope','Straw man'],a:0,fb:'Circular reasoning repeats the claim instead of supporting it.'}
+];
+const HHS_DEFENSE=[
+ {topic:'You support limiting smartphone use during lessons.',q:'Choose the strongest evidence-based defence.',opts:['Phones are always bad and everyone knows it.','A class survey found that frequent notifications interrupted students during independent work; limited use can protect focus while keeping phones available for learning tasks.','Students who disagree are irresponsible.','The school should ban phones because other schools do.'],a:1,fb:'A strong defence gives a clear position, relevant evidence and a reasonable qualification.'},
+ {topic:'You oppose a total ban on make-up at school.',q:'Choose the most balanced defence.',opts:['Rules are stupid.','Everyone should do whatever they want.','A limited, natural-style policy can respect self-expression while maintaining a neat appearance and clear boundaries.','Teachers do not understand students.'],a:2,fb:'A balanced argument recognises both self-expression and school expectations.'},
+ {topic:'You support a school food programme with strict safety checks.',q:'Which defence is most convincing?',opts:['Free food is always perfect.','Students should not ask questions.','The programme can support nutrition, provided schools publish menus, check hygiene and respond to student feedback.','The programme must continue because it already exists.'],a:2,fb:'A convincing position acknowledges conditions and explains how risks will be managed.'},
+ {topic:'You believe students should take part in school decisions.',q:'Which argument best defends your position?',opts:['Students are always right.','Student input can reveal daily problems that adults may overlook, while final decisions can still consider safety, budget and school policy.','Adults never listen.','Other schools let students decide everything.'],a:1,fb:'This argument explains the value of student voice without ignoring other stakeholders.'}
+];
+const hhsAddonState={used:{fallacy:0,defense:0},lastThink:0};
+function hhsSafe(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function hhsChallenge(type,after){
+ const bank=type==='fallacy'?HHS_FALLACIES:HHS_DEFENSE;
+ const q=bank[Math.floor(Math.random()*bank.length)];
+ const opts=shuffle(q.opts.map((t,i)=>({t,ok:i===q.a})));
+ const title=type==='fallacy'?'🔍 Find the Fallacy':'🎭 Defend Your Opinion';
+ open('<div class="chip">'+title+'</div><div class="q" style="margin-top:12px">'+hhsSafe(type==='fallacy'?q.claim:q.topic)+'</div><p style="font-weight:700">'+hhsSafe(q.q)+'</p><div id="hhsOpts">'+opts.map((o,i)=>'<button class="opt" data-hhs="'+i+'"><i>'+'ABCD'[i]+'</i><span>'+hhsSafe(o.t)+'</span></button>').join('')+'</div><div id="hhsFb"></div><div class="row" style="margin-top:12px"><button class="btn gr" id="hhsClose">Close</button></div>');
+ $('#hhsClose').onclick=close;
+ document.querySelectorAll('[data-hhs]').forEach(b=>b.onclick=()=>{
+   document.querySelectorAll('[data-hhs]').forEach(x=>x.disabled=true);
+   const ok=opts[+b.dataset.hhs].ok;
+   if(ok){b.classList.add('ok');xp+=10;playSfx('correct');hhsAddonState.used[type]++}
+   else{b.classList.add('no');playSfx('wrong')}
+   hud();persist();
+   $('#hhsFb').innerHTML='<div class="fb pop">'+(ok?'✅ Correct! +10 XP. ':'❌ Not quite. ')+hhsSafe(q.fb)+'</div>';
+ });
+}
+function hhsDefenseGate(next){
+ const q=HHS_DEFENSE[Math.floor(Math.random()*HHS_DEFENSE.length)];
+ const opts=shuffle(q.opts.map((t,i)=>({t,ok:i===q.a})));
+ open('<div class="chip">🎭 Defend Your Opinion</div><p style="font-weight:700;margin-top:12px">You are about to make a risky move. Defend this position:</p><div class="q">'+hhsSafe(q.topic)+'</div><p>Which response is the strongest defence?</p><div id="hhsOpts">'+opts.map((o,i)=>'<button class="opt" data-hhs="'+i+'"><i>'+'ABCD'[i]+'</i><span>'+hhsSafe(o.t)+'</span></button>').join('')+'</div><div id="hhsFb"></div><div class="row" style="margin-top:12px"><button class="btn gr" id="hhsCancel">Cancel action</button></div>');
+ $('#hhsCancel').onclick=close;
+ document.querySelectorAll('[data-hhs]').forEach(b=>b.onclick=()=>{
+   document.querySelectorAll('[data-hhs]').forEach(x=>x.disabled=true);
+   if(opts[+b.dataset.hhs].ok){b.classList.add('ok');$('#hhsFb').innerHTML='<div class="fb pop">✅ Well defended! Your action can proceed.</div>';setTimeout(()=>{close();next()},650)}
+   else{b.classList.add('no');$('#hhsFb').innerHTML='<div class="fb pop">❌ Your argument needs stronger reasoning. The action is cancelled; no money or XP is lost.</div>'}
+ });
+}
+function hhsAddonHub(){
+ open('<h2>🎯 Side Challenge Hub</h2><p>Take a short break from the main missions. Sharpen your reasoning and earn bonus XP!</p><button class="opt" id="hhsFallacy"><i>🔍</i><span><b>Find the Fallacy</b><small>Spot the hidden flaw in an argument · +10 XP</small></span></button><button class="opt" id="hhsDefense"><i>🎭</i><span><b>Defend Your Opinion</b><small>Choose the strongest defence · +10 XP</small></span></button><p class="tip">Teacher tip: ask students to explain WHY their choice is strongest before revealing the feedback.</p><div class="row"><button class="btn gr" id="hhsHubClose">Close</button></div>');
+ $('#hhsFallacy').onclick=()=>hhsChallenge('fallacy');
+ $('#hhsDefense').onclick=()=>hhsChallenge('defense');
+ $('#hhsHubClose').onclick=close;
+}
+
 function tired(){open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n}</b>You look exhausted, ${me.name}! 😵 Answer the reporter's questions to earn money, then buy food at the Canteen 🍜 to refill your energy.</div></div><div class="row" style="margin-top:14px"><button class="btn" id="ok">OK</button></div>`);$('#ok').onclick=close}
 function shop(msg){
   open(`<div class="who">${npcPortrait(cur)}<div class="bubble"><b class="nm">${cur.npc.n} · Food Stall</b>${msg||'Hungry? Eat up to get your energy back!'}<br>🔋 ${en}/${CONFIG.energyMax} · 💰 ${rp(mo)}</div></div>`+FOOD.map((f,i)=>`<button class="opt" data-f="${i}"><i>${f.ic}</i><span>${f.n} · +${f.e} 🔋</span><b style="margin-left:auto">${rp(f.p)}</b></button>`).join('')+`<div class="row" style="margin-top:12px"><button class="btn gr" id="later">Close</button></div>`);
@@ -1052,7 +1104,7 @@ function enterWorld(){
     const sv=$('#world'),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const w=pt.matrixTransform(sv.getScreenCTM().inverse());me.tx=clamp(w.x,20,980);me.ty=clamp(w.y,48,692)});
   $('#talkbtn').onclick=()=>talk($('#talkbtn').dataset.b);
   document.querySelectorAll('.emotes button').forEach(b=>b.onclick=()=>{me.emo=b.dataset.e;me.emt=Date.now();showEmote('me',me.emo);lastSend=0});
-  $('#press').onclick=reporterAsk;$('#stealbtn').onclick=()=>stealTo($('#stealbtn').dataset.id);schedRep(true);$('#n-map').onclick=()=>panel('map');$('#n-mis').onclick=()=>panel('mis');$('#n-rank').onclick=()=>panel('rank');$('#peerpill').onclick=()=>panel('rank');
+  $('#press').onclick=reporterAsk;$('#stealbtn').onclick=()=>stealTo($('#stealbtn').dataset.id);const addonBtn=document.createElement('button');addonBtn.id='hhsAddonBtn';addonBtn.textContent='🎯 Challenges';addonBtn.style.cssText='position:fixed;right:12px;bottom:88px;z-index:40;background:#5c4ac7;color:#fff;border:2px solid #fff;border-radius:16px;padding:10px 13px;font:700 13px Fredoka, sans-serif;box-shadow:0 4px 0 #382b88';addonBtn.onclick=hhsAddonHub;document.body.appendChild(addonBtn);schedRep(true);$('#n-map').onclick=()=>panel('map');$('#n-mis').onclick=()=>panel('mis');$('#n-rank').onclick=()=>panel('rank');$('#peerpill').onclick=()=>panel('rank');
   requestAnimationFrame(frame);
   setTimeout(()=>{open(`<div class="who">${npcPortrait(BLD[0])}<div class="bubble"><b class="nm">${BLD[0].npc.n} · Principal</b>Welcome to ${SCH.name}, ${name}! 🎒 ${SCH.situation} Walk to each building (tap the map or use WASD / arrows) and talk to the characters with the <b>!</b> sign. Finish all 9 missions! Wrong answers cost 🔋 energy — earn 💰 from reporter questions and refuel at the Canteen 🍜.</div></div><div class="row" style="margin-top:14px"><button class="btn y" id="ok">Let's explore!</button></div>`);$('#ok').onclick=close},300);
 }
