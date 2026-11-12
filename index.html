@@ -50,11 +50,11 @@ input[type=text]:focus{border-color:var(--b)}
 #talkbtn{position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));transform:translateX(-50%);animation:bob 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
 /* mobile movement joystick */
-#moveJoy{position:absolute;left:16px;bottom:calc(112px + env(safe-area-inset-bottom));width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.48);border:4px solid rgba(255,255,255,.88);box-shadow:0 5px 0 rgba(43,42,76,.18),inset 0 0 0 2px rgba(61,139,255,.18);z-index:8;touch-action:none;user-select:none;display:grid;place-items:center}
-#moveJoy:after{content:"";position:absolute;width:42px;height:42px;border-radius:50%;border:2px dashed rgba(43,42,76,.2);pointer-events:none}
-#moveKnob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:linear-gradient(145deg,#fff,#dcecff);border:4px solid #8fc5ff;box-shadow:0 4px 0 rgba(43,42,76,.2);pointer-events:none;transform:translate(0,0)}
-#moveJoy.active{background:rgba(255,255,255,.68);border-color:#ffc83d}
-@media(min-width:900px){#moveJoy{width:116px;height:116px;left:22px;bottom:24px;opacity:.78}}
+#moveJoy{position:absolute;left:12px;bottom:calc(118px + env(safe-area-inset-bottom));width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.72);border:3px solid rgba(255,255,255,.95);box-shadow:0 3px 0 rgba(43,42,76,.16),inset 0 0 0 1px rgba(61,139,255,.16);z-index:8;touch-action:none;user-select:none;display:grid;place-items:center;opacity:.88}
+#moveJoy:after{content:"";position:absolute;width:28px;height:28px;border-radius:50%;border:1.5px dashed rgba(43,42,76,.18);pointer-events:none}
+#moveKnob{position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;background:linear-gradient(145deg,#fff,#dcecff);border:3px solid #8fc5ff;box-shadow:0 3px 0 rgba(43,42,76,.17);pointer-events:none;transform:translate(0,0)}
+#moveJoy.active{background:rgba(255,255,255,.9);border-color:#ffc83d;opacity:1}
+@media(min-width:900px){#moveJoy{width:100px;height:100px;left:20px;bottom:24px}}
 .emotes{position:absolute;right:10px;bottom:calc(98px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
 .emotes button{width:46px;height:46px;border-radius:50%;background:#fff;border:3px solid #cfe9ff;font-size:23px;box-shadow:0 3px 0 rgba(43,42,76,.15)}
 .nav{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.96);border-radius:30px;padding:7px;border:3px solid #cfe9ff;box-shadow:0 6px 0 rgba(43,42,76,.18)}
@@ -1119,7 +1119,9 @@ function enterWorld(){
     const sv=$('#world'),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const w=pt.matrixTransform(sv.getScreenCTM().inverse());me.tx=clamp(w.x,20,980);me.ty=clamp(w.y,48,692)});
   $('#talkbtn').onclick=()=>talk($('#talkbtn').dataset.b);
   document.querySelectorAll('.emotes button').forEach(b=>b.onclick=()=>{me.emo=b.dataset.e;me.emt=Date.now();showEmote('me',me.emo);lastSend=0});
-  $('#press').onclick=reporterAsk;$('#stealbtn').onclick=()=>stealTo($('#stealbtn').dataset.id);const addonBtn=document.createElement('button');addonBtn.id='hhsAddonBtn';addonBtn.textContent='🎯 Challenges';addonBtn.style.cssText='position:fixed;right:12px;bottom:88px;z-index:40;background:#5c4ac7;color:#fff;border:2px solid #fff;border-radius:16px;padding:10px 13px;font:700 13px Fredoka, sans-serif;box-shadow:0 4px 0 #382b88';addonBtn.onclick=hhsAddonHub;document.body.appendChild(addonBtn);schedRep(true);$('#n-map').onclick=()=>panel('map');$('#n-mis').onclick=()=>panel('mis');$('#n-rank').onclick=()=>panel('rank');$('#peerpill').onclick=()=>panel('rank');
+  $('#press').onclick=reporterAsk;$('#stealbtn').onclick=()=>stealTo($('#stealbtn').dataset.id);let hhsNextChallengeTimer=null;
+  const scheduleHhsChallenge=(delay=180000)=>{if(hhsNextChallengeTimer)clearTimeout(hhsNextChallengeTimer);hhsNextChallengeTimer=setTimeout(()=>{if($('#game').classList.contains('hide')||teacherControl.paused||teacherControl.kicked||!$('#modal').classList.contains('hide')){scheduleHhsChallenge(15000);return}hhsChallenge(Math.random()<.5?'fallacy':'defense');scheduleHhsChallenge(240000+Math.random()*120000)},delay)};
+  scheduleHhsChallenge();schedRep(true);$('#n-map').onclick=()=>panel('map');$('#n-mis').onclick=()=>panel('mis');$('#n-rank').onclick=()=>panel('rank');$('#peerpill').onclick=()=>panel('rank');
   requestAnimationFrame(frame);
   setTimeout(()=>{open(`<div class="who">${npcPortrait(BLD[0])}<div class="bubble"><b class="nm">${BLD[0].npc.n} · Principal</b>Welcome to ${SCH.name}, ${name}! 🎒 ${SCH.situation} Walk to each building (tap the map or use WASD / arrows) and talk to the characters with the <b>!</b> sign. Finish all 9 missions! Wrong answers cost 🔋 energy — earn 💰 from reporter questions and refuel at the Canteen 🍜.</div></div><div class="row" style="margin-top:14px"><button class="btn y" id="ok">Let's explore!</button></div>`);$('#ok').onclick=close},300);
 }
