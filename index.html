@@ -49,6 +49,12 @@ input[type=text]:focus{border-color:var(--b)}
 .bar{flex:1;height:10px;background:#e6edf5;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffc83d,#ff9f1c);transition:width .4s}
 #talkbtn{position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));transform:translateX(-50%);animation:bob 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateX(-50%) translateY(-6px)}}
+/* mobile movement joystick */
+#moveJoy{position:absolute;left:16px;bottom:calc(112px + env(safe-area-inset-bottom));width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.48);border:4px solid rgba(255,255,255,.88);box-shadow:0 5px 0 rgba(43,42,76,.18),inset 0 0 0 2px rgba(61,139,255,.18);z-index:8;touch-action:none;user-select:none;display:grid;place-items:center}
+#moveJoy:after{content:"";position:absolute;width:42px;height:42px;border-radius:50%;border:2px dashed rgba(43,42,76,.2);pointer-events:none}
+#moveKnob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:linear-gradient(145deg,#fff,#dcecff);border:4px solid #8fc5ff;box-shadow:0 4px 0 rgba(43,42,76,.2);pointer-events:none;transform:translate(0,0)}
+#moveJoy.active{background:rgba(255,255,255,.68);border-color:#ffc83d}
+@media(min-width:900px){#moveJoy{width:116px;height:116px;left:22px;bottom:24px;opacity:.78}}
 .emotes{position:absolute;right:10px;bottom:calc(98px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
 .emotes button{width:46px;height:46px;border-radius:50%;background:#fff;border:3px solid #cfe9ff;font-size:23px;box-shadow:0 3px 0 rgba(43,42,76,.15)}
 .nav{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.96);border-radius:30px;padding:7px;border:3px solid #cfe9ff;box-shadow:0 6px 0 rgba(43,42,76,.18)}
@@ -147,6 +153,7 @@ input[type=text]:focus{border-color:var(--b)}
   <button class="press hide" id="press"><span>📰</span><div>Reporter Alex wants an interview!<small>Quick grammar question · 💰 Rp5.000</small></div></button>
   <button class="btn r hide" id="stealbtn">🦹 Steal</button>
   <button class="btn y hide" id="talkbtn">💬 Talk</button>
+  <div id="moveJoy" aria-label="Movement joystick"><div id="moveKnob"></div></div>
   <div class="emotes"><button data-e="👋">👋</button><button data-e="😄">😄</button><button data-e="👍">👍</button><button data-e="🤔">🤔</button></div>
   <div class="nav">
     <button id="n-map" class="on"><span>🗺️</span>Map</button>
@@ -700,7 +707,7 @@ let en=CONFIG.energyMax,mo=0,ru={},rcur=null,repT=null,pressT=null,stealCd=0,ste
 const SAVE='hh_save_v1';let sv={res:{},cur:null},lockedMsg=false;
 const saveGet=()=>{try{return JSON.parse(localStorage.getItem(SAVE)||'null')}catch(e){return null}};
 function persist(){if(!me)return;try{localStorage.setItem(SAVE,JSON.stringify({id:me.id,name:me.name,room:me.room,av:me.av,sch:me.sch,rl:me.rl,done,xp,gems,streak,correct,asked,res:sv.res,cur:sv.cur,en,mo,ru,rcur,snackCount,stealsMade,stealsReceived}))}catch(e){}}
-const ents={},keys={};let bots=[],lastSend=0,cam={x:0,y:0};
+const ents={},keys={};let joyX=0,joyY=0,bots=[],lastSend=0,cam={x:0,y:0};
 const poolFor=sc=>{const q=QB[sc.theme],p=Object.values(q).flat(),o=sc.off%p.length;return sc.qs||p.slice(o).concat(p.slice(0,o))};
 const VERBS='go,went,gone;eat,ate,eaten;write,wrote,written;take,took,taken;see,saw,seen;give,gave,given;know,knew,known;come,came,come;run,ran,run;begin,began,begun;drink,drank,drunk;speak,spoke,spoken;break,broke,broken;choose,chose,chosen;drive,drove,driven;fly,flew,flown;forget,forgot,forgotten;buy,bought,bought;bring,brought,brought;teach,taught,taught;think,thought,thought;catch,caught,caught;build,built,built;send,sent,sent;spend,spent,spent;sell,sold,sold;tell,told,told;make,made,made;find,found,found;keep,kept,kept;leave,left,left;lose,lost,lost;meet,met,met;pay,paid,paid;sit,sat,sat;stand,stood,stood;win,won,won;wear,wore,worn;swim,swam,swum;sing,sang,sung;grow,grew,grown;draw,drew,drawn;throw,threw,thrown;steal,stole,stolen;fall,fell,fallen;hide,hid,hidden;ride,rode,ridden;sleep,slept,slept;feel,felt,felt;hear,heard,heard;study,studied,studied;stop,stopped,stopped;carry,carried,carried;plan,planned,planned'.split(';').map(x=>x.split(','));
 const REP=[];VERBS.forEach((v,k)=>{[[1,0,'What is the V2 (past form) of “'+v[0]+'”?'],[2,1,'Change V2 to V3 (past participle): “'+v[1]+'” → ?'],[2,0,'What is the V3 (past participle) of “'+v[0]+'”?']].forEach(([sl,fr,q],t)=>{
@@ -886,7 +893,7 @@ function nearNPC(){let best=null,bd=95;BLD.forEach(b=>{const d=Math.hypot(me.x-b
 let prev=0,moving=false;
 function frame(t){
   const dt=Math.min(.05,(t-prev)/1000||0);prev=t;
-  let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);
+  let dx=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0)+joyX,dy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0)+joyY;
   moving=false;const sp=230*dt;
   if(teacherControl.paused||teacherControl.kicked){dx=0;dy=0;me.tx=null;}
   if(!teacherControl.paused&&!teacherControl.kicked&&(dx||dy)){me.tx=null;const l=Math.hypot(dx,dy);moving=tryMove(me,dx/l*sp,dy/l*sp);if(dx)me.f=dx>0?1:-1}
@@ -1100,6 +1107,14 @@ function enterWorld(){
   if(teacherPollTimer)clearInterval(teacherPollTimer);pollTeacherControls();teacherPollTimer=setInterval(pollTeacherControls,2000);
   addEventListener('keydown',e=>{if($('#game').classList.contains('hide'))return;const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=1;if(k==='e'||k===' '){const b=nearNPC();if(b&&$('#modal').classList.contains('hide')){e.preventDefault();talk(b.id)}}if(k.startsWith('Arrow'))e.preventDefault()});
   addEventListener('keyup',e=>{keys[e.key.length===1?e.key.toLowerCase():e.key]=0});
+  const joy=$('#moveJoy'),knob=$('#moveKnob');let joyPointer=null;
+  const resetJoy=()=>{joyX=0;joyY=0;joyPointer=null;joy.classList.remove('active');knob.style.transform='translate(0px,0px)'};
+  const updateJoy=e=>{if(joyPointer!==e.pointerId)return;const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.34,len=Math.hypot(dx,dy),scale=len>max?max/len:1,px=dx*scale,py=dy*scale;knob.style.transform='translate('+px+'px,'+py+'px)';joyX=px/max;joyY=py/max};
+  joy.addEventListener('pointerdown',e=>{if(!$('#modal').classList.contains('hide'))return;e.preventDefault();joyPointer=e.pointerId;joy.classList.add('active');joy.setPointerCapture(e.pointerId);updateJoy(e)});
+  joy.addEventListener('pointermove',e=>{if(joyPointer===e.pointerId){e.preventDefault();updateJoy(e)}});
+  joy.addEventListener('pointerup',e=>{if(joyPointer===e.pointerId)resetJoy()});
+  joy.addEventListener('pointercancel',resetJoy);
+  joy.addEventListener('lostpointercapture',resetJoy);
   $('#world').addEventListener('pointerdown',e=>{if(!$('#modal').classList.contains('hide'))return;if(tab!=='map')panel('map');
     const sv=$('#world'),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const w=pt.matrixTransform(sv.getScreenCTM().inverse());me.tx=clamp(w.x,20,980);me.ty=clamp(w.y,48,692)});
   $('#talkbtn').onclick=()=>talk($('#talkbtn').dataset.b);
